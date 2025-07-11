@@ -1,0 +1,195 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Printer, Truck, Plus, Star, Users, Clock, Shield } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { GlassCard } from '../components/ui/GlassCard';
+import { GlassButton } from '../components/ui/GlassButton';
+
+export const HomePage: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handleActionClick = (path: string) => {
+    if (isAuthenticated) {
+      navigate(path);
+    } else {
+      navigate('/login', { state: { from: { pathname: path } } });
+    }
+  };
+
+  const reviews = [
+    {
+      id: '1',
+      name: 'Sarah Johnson',
+      avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100',
+      rating: 5,
+      comment: 'Amazing service! Got my documents printed and delivered within an hour. The quality was perfect.',
+      serviceType: 'printing',
+    },
+    {
+      id: '2',
+      name: 'Mike Chen',
+      avatar: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=100',
+      rating: 5,
+      comment: 'Love being a printer owner on this platform. Great way to earn extra income with my printer.',
+      serviceType: 'printing',
+    },
+    {
+      id: '3',
+      name: 'Emma Davis',
+      avatar: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=100',
+      rating: 4,
+      comment: 'Delivery service is super convenient. Perfect for when I\'m stuck in the library studying.',
+      serviceType: 'delivery',
+    },
+  ];
+
+  return (
+    <div className="min-h-screen pt-16">
+      {/* Hero Section */}
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-campus-green/10 to-info/10 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 w-full h-full"></div>
+        
+        <div className="max-w-4xl mx-auto text-center relative">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">
+            <span className="gradient-text">Campus Printing & Delivery</span>
+            <br />
+            <span className="text-dark-text">Made Simple</span>
+          </h1>
+          
+          <p className="text-xl text-dark-text-secondary mb-12 max-w-2xl mx-auto animate-slide-up">
+            Connect with printers across campus, get documents delivered, and earn money by sharing your printer or offering delivery services.
+          </p>
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto animate-slide-up">
+            <GlassCard hover className="p-6 cursor-pointer" onClick={() => handleActionClick('/printers')}>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-campus-green to-info rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Plus size={24} className="text-white" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">Add Printer</h3>
+                <p className="text-sm text-dark-text-secondary">Register your printer and start earning</p>
+              </div>
+            </GlassCard>
+
+            <GlassCard hover className="p-6 cursor-pointer" onClick={() => handleActionClick('/printers')}>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-info to-campus-green rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Printer size={24} className="text-white" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">Request Print</h3>
+                <p className="text-sm text-dark-text-secondary">Find nearby printers and print documents</p>
+              </div>
+            </GlassCard>
+
+            <GlassCard hover className="p-6 cursor-pointer" onClick={() => handleActionClick('/delivery')}>
+              <div className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-campus-green to-info rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Truck size={24} className="text-white" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">Request Delivery</h3>
+                <p className="text-sm text-dark-text-secondary">Get your items delivered across campus</p>
+              </div>
+            </GlassCard>
+          </div>
+        </div>
+      </section>
+
+      {/* About Us Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">About CampusPrint</h2>
+            <p className="text-xl text-dark-text-secondary max-w-3xl mx-auto">
+              We're revolutionizing campus services by connecting students, printer owners, and delivery providers in one seamless platform.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <GlassCard className="text-center p-8">
+              <div className="w-16 h-16 bg-gradient-to-r from-campus-green to-info rounded-full flex items-center justify-center mx-auto mb-6">
+                <Users size={24} className="text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Community Driven</h3>
+              <p className="text-dark-text-secondary">
+                Built by students, for students. Our platform connects the campus community and creates opportunities for everyone.
+              </p>
+            </GlassCard>
+
+            <GlassCard className="text-center p-8">
+              <div className="w-16 h-16 bg-gradient-to-r from-info to-campus-green rounded-full flex items-center justify-center mx-auto mb-6">
+                <Clock size={24} className="text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Fast & Reliable</h3>
+              <p className="text-dark-text-secondary">
+                Get your documents printed and delivered quickly with our network of trusted campus partners.
+              </p>
+            </GlassCard>
+
+            <GlassCard className="text-center p-8">
+              <div className="w-16 h-16 bg-gradient-to-r from-campus-green to-info rounded-full flex items-center justify-center mx-auto mb-6">
+                <Shield size={24} className="text-white" />
+              </div>
+              <h3 className="text-xl font-semibold mb-4">Secure & Trusted</h3>
+              <p className="text-dark-text-secondary">
+                Your documents and payments are protected with enterprise-grade security and verified users.
+              </p>
+            </GlassCard>
+          </div>
+        </div>
+      </section>
+
+      {/* User Reviews Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">What Students Say</h2>
+            <p className="text-xl text-dark-text-secondary">
+              Join thousands of satisfied students who trust CampusPrint for their printing and delivery needs.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {reviews.map((review) => (
+              <GlassCard key={review.id} className="p-6">
+                <div className="flex items-center mb-4">
+                  <img
+                    src={review.avatar}
+                    alt={review.name}
+                    className="w-12 h-12 rounded-full object-cover mr-4"
+                  />
+                  <div>
+                    <h4 className="font-semibold">{review.name}</h4>
+                    <div className="flex items-center">
+                      {[...Array(review.rating)].map((_, i) => (
+                        <Star key={i} size={16} className="text-yellow-400 fill-current" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-dark-text-secondary italic">"{review.comment}"</p>
+                <div className="mt-4">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-campus-green-light text-campus-green">
+                    {review.serviceType}
+                  </span>
+                </div>
+              </GlassCard>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <GlassButton
+              variant="primary"
+              size="lg"
+              glow
+              onClick={() => handleActionClick('/signup')}
+            >
+              Join CampusPrint Today
+            </GlassButton>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
