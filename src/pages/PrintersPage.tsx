@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, Filter, MapPin, DollarSign, Star, Upload, Printer } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Search, Filter, MapPin, DollarSign, Star, Upload, Printer, X } from 'lucide-react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { GlassButton } from '../components/ui/GlassButton';
 import { GlassInput } from '../components/ui/GlassInput';
@@ -11,6 +11,8 @@ export const PrintersPage: React.FC = () => {
   const [selectedType, setSelectedType] = useState('all');
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedPrinter, setSelectedPrinter] = useState<PrinterType | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const printers: PrinterType[] = [
     {
@@ -247,24 +249,47 @@ export const PrintersPage: React.FC = () => {
                 </div>
                 
                 <div className="border-2 border-dashed border-glass-border rounded-component p-8 text-center mb-6">
-                  <Upload size={48} className="mx-auto text-dark-text-muted mb-4" />
-                  <h4 className="text-lg font-medium text-dark-text mb-2">Upload Document</h4>
-                  <p className="text-sm text-dark-text-secondary mb-4">
-                    Drag and drop your files here, or click to browse
-                  </p>
-                  <input
-                    type="file"
-                    multiple
-                    accept=".pdf,.doc,.docx,.txt"
-                    className="hidden"
-                    id="file-upload"
-                  />
-                  <label htmlFor="file-upload">
-                    <GlassButton variant="secondary" as="span">
-                      Browse Files
-                    </GlassButton>
-                  </label>
+                  {selectedFiles.length > 0 ? (
+                    <div className="space-y-4">
+                      <h4 className="text-lg font-medium text-dark-text">Selected Files</h4>
+                      {selectedFiles.map((file, index) => (
+                        <div key={index} className="flex items-center justify-between bg-glass-bg p-3 rounded-component">
+                          <span className="text-sm text-dark-text truncate">{file.name}</span>
+                          <GlassButton
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSelectedFiles(prev => prev.filter((_, i) => i !== index))}
+                          >
+                            <X size={16} />
+                          </GlassButton>
+                        </div>
+                      ))}
+                      <GlassButton variant="secondary" onClick={() => fileInputRef.current?.click()}>
+                        Add More Files
+                      </GlassButton>
+                    </div>
+                  ) : (
+                    <>
+                      <Upload size={48} className="mx-auto text-dark-text-muted mb-4" />
+                      <h4 className="text-lg font-medium text-dark-text mb-2">Upload Document</h4>
+                      <p className="text-sm text-dark-text-secondary mb-4">
+                        Drag and drop your files here, or click to browse
+                      </p>
+                      <GlassButton variant="secondary" onClick={() => fileInputRef.current?.click()}>
+                        Browse Files
+                      </GlassButton>
+                    </>
+                  )}
                 </div>
+                <input
+                  type="file"
+                  multiple
+                  accept=".pdf,.docx"
+                  className="hidden"
+                  id="file-upload"
+                  ref={fileInputRef}
+                  onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))}
+                />
                 
                 <div className="flex gap-3">
                   <GlassButton

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { GlassCard } from '../components/ui/GlassCard';
 import { GlassButton } from '../components/ui/GlassButton';
 import { GlassInput } from '../components/ui/GlassInput';
@@ -33,6 +34,8 @@ export const DashboardPage: React.FC = () => {
     hall: '',
     room: '',
   });
+
+  const navigate = useNavigate();
 
   const handlePrinterApplication = () => {
     // In real app, this would submit to API
@@ -176,10 +179,15 @@ export const DashboardPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {currentRole === 'user' && (
                 <>
-                  <GlassButton variant="secondary" className="p-4 h-auto flex-col">
-                    <FileText size={24} className="mb-2" />
-                    <span className="font-medium">Upload Document</span>
-                    <span className="text-xs text-dark-text-secondary">Upload files to print</span>
+                  <GlassButton variant="secondary" className="p-4 h-auto flex-col" onClick={() => navigate('/printers')}>
+                    <Printer size={24} className="mb-2" />
+                    <span className="font-medium">Request Print</span>
+                    <span className="text-xs text-dark-text-secondary">Find printers and print documents</span>
+                  </GlassButton>
+                  <GlassButton variant="secondary" className="p-4 h-auto flex-col" onClick={() => navigate('/delivery')}>
+                    <Truck size={24} className="mb-2" />
+                    <span className="font-medium">Request Delivery</span>
+                    <span className="text-xs text-dark-text-secondary">Get items delivered on campus</span>
                   </GlassButton>
                   <GlassButton variant="secondary" className="p-4 h-auto flex-col">
                     <DollarSign size={24} className="mb-2" />
