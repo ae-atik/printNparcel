@@ -34,7 +34,7 @@ export const LoginPage: React.FC = () => {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold gradient-text">Welcome Back</h2>
-          <p className="mt-2 text-dark-text-secondary">Sign in to your account</p>
+          <p className="mt-2 text-theme-text-secondary">Sign in to your account</p>
         </div>
 
         <GlassCard className="p-8">
@@ -66,7 +66,7 @@ export const LoginPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-dark-text-muted hover:text-dark-text transition-colors"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-theme-text-muted hover:text-theme-text transition-colors"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -84,7 +84,7 @@ export const LoginPage: React.FC = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-dark-text-secondary">
+            <p className="text-theme-text-secondary">
               Don't have an account?{' '}
               <Link to="/signup" className="text-campus-green hover:text-campus-green-hover font-medium">
                 Sign up
@@ -94,8 +94,8 @@ export const LoginPage: React.FC = () => {
 
           {/* Demo Accounts */}
           <div className="mt-8 p-4 bg-glass-bg rounded-component border border-glass-border">
-            <h3 className="text-sm font-medium text-dark-text mb-3">Demo Accounts:</h3>
-            <div className="space-y-2 text-xs text-dark-text-secondary">
+            <h3 className="text-sm font-medium text-theme-text mb-3">Demo Accounts:</h3>
+            <div className="space-y-2 text-xs text-theme-text-secondary">
               <div>
                 <strong>Student:</strong> student@campus.edu / password
               </div>

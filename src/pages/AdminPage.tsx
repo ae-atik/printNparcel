@@ -1,103 +1,65 @@
-import React, { useState } from 'react';
-import { Users, Printer, BarChart3, CheckCircle, XCircle, Eye, Settings } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Users, Printer, BarChart3, CheckCircle, XCircle, Eye, Settings, Trash2 } from 'lucide-react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { GlassButton } from '../components/ui/GlassButton';
 import { GlassInput } from '../components/ui/GlassInput';
+import { useToast } from '../context/ToastContext';
 import { User, Printer as PrinterType } from '../types';
+import usersData from '../data/users.json';
+import printersData from '../data/printers.json';
 
 export const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'users' | 'printers' | 'analytics'>('users');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedPrinter, setSelectedPrinter] = useState<PrinterType | null>(null);
+  const { addToast } = useToast();
 
-  const mockUsers: User[] = [
-    {
-      id: 'user-1',
-      email: 'student@campus.edu',
-      username: 'student123',
-      firstName: 'Jane',
-      lastName: 'Student',
-      profilePicture: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100',
-      credits: 45.50,
-      roles: ['user'],
-      university: 'Campus University',
-      hall: 'Residence Hall A',
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'user-2',
-      email: 'owner@campus.edu',
-      username: 'printerowner',
-      firstName: 'John',
-      lastName: 'Owner',
-      profilePicture: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=100',
-      credits: 250.75,
-      roles: ['printer-owner', 'user'],
-      university: 'Campus University',
-      hall: 'Engineering Hall',
-      createdAt: new Date().toISOString(),
-    },
-  ];
+  // Set active tab based on URL hash or default to users
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '');
+    if (hash && ['users', 'printers', 'analytics'].includes(hash)) {
+      setActiveTab(hash as 'users' | 'printers' | 'analytics');
+    }
+  }, []);
 
-  const mockPrinters: PrinterType[] = [
-    {
-      id: 'printer-1',
-      name: 'QuickPrint Pro',
-      ownerId: 'user-2',
-      ownerName: 'John Owner',
-      type: 'both',
-      pricePerPageBW: 0.10,
-      pricePerPageColor: 0.25,
-      location: {
-        university: 'Campus University',
-        hall: 'Library',
-        room: '2nd Floor',
-      },
-      specifications: {
-        brand: 'HP',
-        model: 'LaserJet Pro',
-        paperSizes: ['A4', 'Letter', 'Legal'],
-        features: ['Duplex', 'Stapling'],
-      },
-      status: 'online',
-      isApproved: true,
-      rating: 4.8,
-      totalJobs: 1250,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: 'printer-2',
-      name: 'Pending Approval Printer',
-      ownerId: 'user-2',
-      ownerName: 'John Owner',
-      type: 'color',
-      pricePerPageBW: 0.12,
-      pricePerPageColor: 0.30,
-      location: {
-        university: 'Campus University',
-        hall: 'Engineering Building',
-        room: 'Room 205',
-      },
-      specifications: {
-        brand: 'Canon',
-        model: 'PIXMA Pro',
-        paperSizes: ['A4', 'Letter'],
-        features: ['Color', 'High Resolution'],
-      },
-      status: 'offline',
-      isApproved: false,
-      rating: 0,
-      totalJobs: 0,
-      createdAt: new Date().toISOString(),
-    },
-  ];
+  const mockUsers: User[] = usersData.users;
+
+  const mockPrinters: PrinterType[] = printersData.printers;
 
   const handleApprovePrinter = (printerId: string) => {
     alert(`Printer ${printerId} approved successfully!`);
   };
 
   const handleRejectPrinter = (printerId: string) => {
-    alert(`Printer ${printerId} rejected.`);
+    addToast({
+      type: 'info',
+      title: 'Printer Rejected',
+      message: 'The printer application has been rejected.'
+    });
+  };
+
+  const handleRemoveUser = (userId: string, userName: string) => {
+    if (window.confirm(`Are you sure you want to remove user "${userName}"? This action cannot be undone.`)) {
+      // In real app, this would delete via API
+      addToast({
+        type: 'success',
+        title: 'User Removed',
+        message: `User "${userName}" has been removed successfully.`
+      });
+      setSelectedUser(null);
+    }
+  };
+
+  const handleRemovePrinter = (printerId: string, printerName: string) => {
+    if (window.confirm(`Are you sure you want to remove printer "${printerName}"? This action cannot be undone.`)) {
+      // In real app, this would delete via API
+      addToast({
+        type: 'success',
+        title: 'Printer Removed',
+        message: `Printer "${printerName}" has been removed successfully.`
+      });
+      setSelectedPrinter(null);
+    }
   };
 
   const renderUsersTab = () => (
@@ -113,7 +75,7 @@ export const AdminPage: React.FC = () => {
               />
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <h3 className="font-semibold text-dark-text">{user.firstName} {user.lastName}</h3>
+                  <h3 className="font-semibold text-theme-text">{user.firstName} {user.lastName}</h3>
                   <div className="flex gap-1">
                     {user.roles.map((role) => (
                       <span
@@ -125,9 +87,9 @@ export const AdminPage: React.FC = () => {
                     ))}
                   </div>
                 </div>
-                <p className="text-sm text-dark-text-secondary mb-1">@{user.username}</p>
-                <p className="text-sm text-dark-text-secondary mb-1">{user.email}</p>
-                <p className="text-sm text-dark-text-secondary mb-3">{user.university} - {user.hall}</p>
+                <p className="text-sm text-theme-text-secondary mb-1">@{user.username}</p>
+                <p className="text-sm text-theme-text-secondary mb-1">{user.email}</p>
+                <p className="text-sm text-theme-text-secondary mb-3">{user.university} - {user.hall}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-campus-green">
                     Credits: ${user.credits.toFixed(2)}
@@ -160,7 +122,7 @@ export const AdminPage: React.FC = () => {
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <h3 className="font-semibold text-dark-text">{printer.name}</h3>
+                  <h3 className="font-semibold text-theme-text">{printer.name}</h3>
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                     printer.isApproved 
                       ? 'bg-success/10 text-success' 
@@ -169,20 +131,20 @@ export const AdminPage: React.FC = () => {
                     {printer.isApproved ? 'Approved' : 'Pending'}
                   </span>
                 </div>
-                <p className="text-sm text-dark-text-secondary mb-1">
+                <p className="text-sm text-theme-text-secondary mb-1">
                   {printer.specifications.brand} {printer.specifications.model}
                 </p>
-                <p className="text-sm text-dark-text-secondary mb-1">
+                <p className="text-sm text-theme-text-secondary mb-1">
                   Owner: {printer.ownerName}
                 </p>
-                <p className="text-sm text-dark-text-secondary mb-3">
+                <p className="text-sm text-theme-text-secondary mb-3">
                   {printer.location.hall} - {printer.location.room}
                 </p>
               </div>
             </div>
             
             <div className="flex items-center justify-between">
-              <div className="text-sm text-dark-text-secondary">
+              <div className="text-sm text-theme-text-secondary">
                 <span className="font-medium">B&W: ${printer.pricePerPageBW}</span>
                 {printer.pricePerPageColor > 0 && (
                   <span className="ml-3 font-medium">Color: ${printer.pricePerPageColor}</span>
@@ -230,23 +192,23 @@ export const AdminPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <GlassCard className="p-6 text-center">
           <Users size={32} className="mx-auto text-info mb-4" />
-          <h3 className="text-2xl font-bold text-dark-text">1,234</h3>
-          <p className="text-dark-text-secondary">Total Users</p>
+          <h3 className="text-2xl font-bold text-theme-text">1,234</h3>
+          <p className="text-theme-text-secondary">Total Users</p>
         </GlassCard>
         <GlassCard className="p-6 text-center">
           <Printer size={32} className="mx-auto text-success mb-4" />
-          <h3 className="text-2xl font-bold text-dark-text">45</h3>
-          <p className="text-dark-text-secondary">Active Printers</p>
+          <h3 className="text-2xl font-bold text-theme-text">45</h3>
+          <p className="text-theme-text-secondary">Active Printers</p>
         </GlassCard>
         <GlassCard className="p-6 text-center">
           <BarChart3 size={32} className="mx-auto text-campus-green mb-4" />
-          <h3 className="text-2xl font-bold text-dark-text">$12,450</h3>
-          <p className="text-dark-text-secondary">Monthly Revenue</p>
+          <h3 className="text-2xl font-bold text-theme-text">$12,450</h3>
+          <p className="text-theme-text-secondary">Monthly Revenue</p>
         </GlassCard>
       </div>
       
       <GlassCard className="p-6">
-        <h3 className="text-lg font-semibold text-dark-text mb-4">Recent Activity</h3>
+        <h3 className="text-lg font-semibold text-theme-text mb-4">Recent Activity</h3>
         <div className="space-y-3">
           {[
             { action: 'New user registered', time: '5 minutes ago', type: 'user' },
@@ -255,8 +217,8 @@ export const AdminPage: React.FC = () => {
             { action: 'Delivery request fulfilled', time: '3 hours ago', type: 'delivery' },
           ].map((activity, index) => (
             <div key={index} className="flex items-center justify-between py-2 border-b border-glass-border last:border-b-0">
-              <span className="text-sm text-dark-text">{activity.action}</span>
-              <span className="text-xs text-dark-text-secondary">{activity.time}</span>
+              <span className="text-sm text-theme-text">{activity.action}</span>
+              <span className="text-xs text-theme-text-secondary">{activity.time}</span>
             </div>
           ))}
         </div>
@@ -270,7 +232,7 @@ export const AdminPage: React.FC = () => {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold gradient-text mb-2">Admin Dashboard</h1>
-          <p className="text-dark-text-secondary">Manage users, printers, and platform analytics</p>
+          <p className="text-theme-text-secondary">Manage users, printers, and platform analytics</p>
         </div>
 
         {/* Navigation Tabs */}
@@ -285,11 +247,14 @@ export const AdminPage: React.FC = () => {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => {
+                    setActiveTab(tab.id as any);
+                    window.location.hash = tab.id;
+                  }}
                   className={`flex items-center px-4 py-2 rounded-component text-sm font-medium transition-colors ${
                     activeTab === tab.id
                       ? 'bg-campus-green text-white'
-                      : 'text-dark-text-secondary hover:text-dark-text hover:bg-glass-hover'
+                      : 'text-theme-text-secondary hover:text-theme-text hover:bg-glass-hover'
                   }`}
                 >
                   <Icon size={16} className="mr-2" />
@@ -319,29 +284,29 @@ export const AdminPage: React.FC = () => {
                       className="w-20 h-20 rounded-full object-cover"
                     />
                     <div>
-                      <h4 className="font-semibold text-dark-text">
+                      <h4 className="font-semibold text-theme-text">
                         {selectedUser.firstName} {selectedUser.lastName}
                       </h4>
-                      <p className="text-dark-text-secondary">@{selectedUser.username}</p>
-                      <p className="text-dark-text-secondary">{selectedUser.email}</p>
+                      <p className="text-theme-text-secondary">@{selectedUser.username}</p>
+                      <p className="text-theme-text-secondary">{selectedUser.email}</p>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-dark-text-secondary">University</p>
-                      <p className="text-dark-text font-medium">{selectedUser.university}</p>
+                      <p className="text-theme-text-secondary">University</p>
+                      <p className="text-theme-text font-medium">{selectedUser.university}</p>
                     </div>
                     <div>
-                      <p className="text-dark-text-secondary">Hall</p>
-                      <p className="text-dark-text font-medium">{selectedUser.hall}</p>
+                      <p className="text-theme-text-secondary">Hall</p>
+                      <p className="text-theme-text font-medium">{selectedUser.hall}</p>
                     </div>
                     <div>
-                      <p className="text-dark-text-secondary">Credits</p>
-                      <p className="text-dark-text font-medium">${selectedUser.credits.toFixed(2)}</p>
+                      <p className="text-theme-text-secondary">Credits</p>
+                      <p className="text-theme-text font-medium">${selectedUser.credits.toFixed(2)}</p>
                     </div>
                     <div>
-                      <p className="text-dark-text-secondary">Roles</p>
+                      <p className="text-theme-text-secondary">Roles</p>
                       <div className="flex gap-1 mt-1">
                         {selectedUser.roles.map((role) => (
                           <span
@@ -364,11 +329,12 @@ export const AdminPage: React.FC = () => {
                       Close
                     </GlassButton>
                     <GlassButton
-                      variant="primary"
+                      variant="danger"
+                      onClick={() => handleRemoveUser(selectedUser.id, `${selectedUser.firstName} ${selectedUser.lastName}`)}
                       className="flex-1"
                     >
-                      <Settings size={16} className="mr-1" />
-                      Manage User
+                      <Trash2 size={16} className="mr-1" />
+                      Remove User
                     </GlassButton>
                   </div>
                 </div>
@@ -389,32 +355,32 @@ export const AdminPage: React.FC = () => {
                       <Printer size={24} className="text-campus-green" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-dark-text">{selectedPrinter.name}</h4>
-                      <p className="text-dark-text-secondary">
+                      <h4 className="font-semibold text-theme-text">{selectedPrinter.name}</h4>
+                      <p className="text-theme-text-secondary">
                         {selectedPrinter.specifications.brand} {selectedPrinter.specifications.model}
                       </p>
-                      <p className="text-dark-text-secondary">Owner: {selectedPrinter.ownerName}</p>
+                      <p className="text-theme-text-secondary">Owner: {selectedPrinter.ownerName}</p>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-dark-text-secondary">Location</p>
-                      <p className="text-dark-text font-medium">
+                      <p className="text-theme-text-secondary">Location</p>
+                      <p className="text-theme-text font-medium">
                         {selectedPrinter.location.hall} - {selectedPrinter.location.room}
                       </p>
                     </div>
                     <div>
-                      <p className="text-dark-text-secondary">Type</p>
-                      <p className="text-dark-text font-medium">{selectedPrinter.type}</p>
+                      <p className="text-theme-text-secondary">Type</p>
+                      <p className="text-theme-text font-medium">{selectedPrinter.type}</p>
                     </div>
                     <div>
-                      <p className="text-dark-text-secondary">B&W Price</p>
-                      <p className="text-dark-text font-medium">${selectedPrinter.pricePerPageBW}/page</p>
+                      <p className="text-theme-text-secondary">B&W Price</p>
+                      <p className="text-theme-text font-medium">${selectedPrinter.pricePerPageBW}/page</p>
                     </div>
                     <div>
-                      <p className="text-dark-text-secondary">Color Price</p>
-                      <p className="text-dark-text font-medium">
+                      <p className="text-theme-text-secondary">Color Price</p>
+                      <p className="text-theme-text font-medium">
                         {selectedPrinter.pricePerPageColor > 0 
                           ? `$${selectedPrinter.pricePerPageColor}/page`
                           : 'N/A'
@@ -424,8 +390,8 @@ export const AdminPage: React.FC = () => {
                   </div>
                   
                   <div>
-                    <p className="text-dark-text-secondary text-sm">Features</p>
-                    <p className="text-dark-text font-medium">
+                    <p className="text-theme-text-secondary text-sm">Features</p>
+                    <p className="text-theme-text font-medium">
                       {selectedPrinter.specifications.features.join(', ')}
                     </p>
                   </div>
@@ -437,6 +403,14 @@ export const AdminPage: React.FC = () => {
                       className="flex-1"
                     >
                       Close
+                    </GlassButton>
+                    <GlassButton
+                      variant="danger"
+                      onClick={() => handleRemovePrinter(selectedPrinter.id, selectedPrinter.name)}
+                      className="flex-1"
+                    >
+                      <Trash2 size={16} className="mr-1" />
+                      Remove Printer
                     </GlassButton>
                     {!selectedPrinter.isApproved && (
                       <GlassButton

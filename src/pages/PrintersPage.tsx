@@ -1,9 +1,12 @@
-import React, { useState, useRef } from 'react';
-import { Search, Filter, MapPin, DollarSign, Star, Upload, Printer, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Filter, MapPin, DollarSign, Star, Upload, Printer } from 'lucide-react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { GlassButton } from '../components/ui/GlassButton';
 import { GlassInput } from '../components/ui/GlassInput';
+import { FileUpload } from '../components/ui/FileUpload';
+import { Modal } from '../components/ui/Modal';
 import { Printer as PrinterType } from '../types';
+import printersData from '../data/printers.json';
 
 export const PrintersPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -11,86 +14,10 @@ export const PrintersPage: React.FC = () => {
   const [selectedType, setSelectedType] = useState('all');
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedPrinter, setSelectedPrinter] = useState<PrinterType | null>(null);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [colorPrint, setColorPrint] = useState(false);
 
-  const printers: PrinterType[] = [
-    {
-      id: '1',
-      name: 'QuickPrint Pro',
-      ownerId: 'owner-1',
-      ownerName: 'Campus Print Services',
-      type: 'both',
-      pricePerPageBW: 0.10,
-      pricePerPageColor: 0.25,
-      location: {
-        university: 'Campus University',
-        hall: 'Library',
-        room: '2nd Floor',
-      },
-      specifications: {
-        brand: 'HP',
-        model: 'LaserJet Pro',
-        paperSizes: ['A4', 'Letter', 'Legal'],
-        features: ['Duplex', 'Stapling'],
-      },
-      status: 'online',
-      isApproved: true,
-      rating: 4.8,
-      totalJobs: 1250,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: '2',
-      name: 'Student Center Printer',
-      ownerId: 'owner-2',
-      ownerName: 'Print Hub LLC',
-      type: 'bw',
-      pricePerPageBW: 0.08,
-      pricePerPageColor: 0,
-      location: {
-        university: 'Campus University',
-        hall: 'Student Union',
-        room: 'Ground Floor',
-      },
-      specifications: {
-        brand: 'Canon',
-        model: 'ImageRunner',
-        paperSizes: ['A4', 'Letter'],
-        features: ['Duplex'],
-      },
-      status: 'online',
-      isApproved: true,
-      rating: 4.5,
-      totalJobs: 890,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: '3',
-      name: 'Engineering Lab Printer',
-      ownerId: 'owner-3',
-      ownerName: 'TechPrint Solutions',
-      type: 'color',
-      pricePerPageBW: 0.12,
-      pricePerPageColor: 0.30,
-      location: {
-        university: 'Campus University',
-        hall: 'Engineering Building',
-        room: 'Room 205',
-      },
-      specifications: {
-        brand: 'Epson',
-        model: 'WorkForce Pro',
-        paperSizes: ['A4', 'Letter', 'A3'],
-        features: ['Color', 'High Resolution'],
-      },
-      status: 'busy',
-      isApproved: true,
-      rating: 4.9,
-      totalJobs: 650,
-      createdAt: new Date().toISOString(),
-    },
-  ];
+  const printers: PrinterType[] = printersData.printers.filter(printer => printer.isApproved);
 
   const filteredPrinters = printers.filter(printer => {
     const matchesSearch = printer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -102,7 +29,23 @@ export const PrintersPage: React.FC = () => {
 
   const handlePrintRequest = (printer: PrinterType) => {
     setSelectedPrinter(printer);
+    setUploadedFiles([]);
+    setColorPrint(false);
     setShowUploadModal(true);
+  };
+
+  const handleSubmitPrintJob = () => {
+    if (uploadedFiles.length === 0) {
+      alert('Please upload at least one file');
+      return;
+    }
+    
+    const totalCost = uploadedFiles.length * (colorPrint ? selectedPrinter?.pricePerPageColor || 0 : selectedPrinter?.pricePerPageBW || 0);
+    alert(`Print job submitted! Total cost: $${totalCost.toFixed(2)}`);
+    setShowUploadModal(false);
+    setSelectedPrinter(null);
+    setUploadedFiles([]);
+    setColorPrint(false);
   };
 
   return (
@@ -111,7 +54,7 @@ export const PrintersPage: React.FC = () => {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold gradient-text mb-2">Available Printers</h1>
-          <p className="text-dark-text-secondary">Find and print to printers near you</p>
+          <p className="text-theme-text-secondary">Find and print to printers near you</p>
         </div>
 
         {/* Search and Filters */}
@@ -128,7 +71,7 @@ export const PrintersPage: React.FC = () => {
             <select
               value={selectedLocation}
               onChange={(e) => setSelectedLocation(e.target.value)}
-              className="px-4 py-3 bg-glass-bg backdrop-blur-glass border border-glass-border rounded-component text-dark-text focus:outline-none focus:border-campus-green"
+              className="px-4 py-3 bg-glass-bg backdrop-blur-glass border border-glass-border rounded-component text-theme-text focus:outline-none focus:border-campus-green"
             >
               <option value="all">All Locations</option>
               <option value="library">Library</option>
@@ -139,7 +82,7 @@ export const PrintersPage: React.FC = () => {
             <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              className="px-4 py-3 bg-glass-bg backdrop-blur-glass border border-glass-border rounded-component text-dark-text focus:outline-none focus:border-campus-green"
+              className="px-4 py-3 bg-glass-bg backdrop-blur-glass border border-glass-border rounded-component text-theme-text focus:outline-none focus:border-campus-green"
             >
               <option value="all">All Types</option>
               <option value="color">Color</option>
@@ -170,23 +113,23 @@ export const PrintersPage: React.FC = () => {
               <div className="p-6">
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <h3 className="font-semibold text-dark-text">{printer.name}</h3>
-                    <p className="text-sm text-dark-text-secondary">{printer.specifications.brand} {printer.specifications.model}</p>
+                    <h3 className="font-semibold text-theme-text">{printer.name}</h3>
+                    <p className="text-sm text-theme-text-secondary">{printer.specifications.brand} {printer.specifications.model}</p>
                   </div>
                   <div className="text-right">
-                    <div className="flex items-center text-sm text-dark-text-secondary">
+                    <div className="flex items-center text-sm text-theme-text-secondary">
                       <DollarSign size={14} />
                       <span className="font-medium">{printer.pricePerPageBW}/page</span>
                     </div>
                     {printer.type === 'both' || printer.type === 'color' ? (
-                      <div className="flex items-center text-sm text-dark-text-secondary">
+                      <div className="flex items-center text-sm text-theme-text-secondary">
                         <span className="text-xs">Color: ${printer.pricePerPageColor}/page</span>
                       </div>
                     ) : null}
                   </div>
                 </div>
                 
-                <div className="flex items-center text-sm text-dark-text-secondary mb-3">
+                <div className="flex items-center text-sm text-theme-text-secondary mb-3">
                   <MapPin size={16} className="mr-2" />
                   <span>{printer.location.hall}</span>
                   {printer.location.room && (
@@ -201,9 +144,9 @@ export const PrintersPage: React.FC = () => {
                   <div className="flex items-center space-x-2">
                     <div className="flex items-center">
                       <Star size={16} className="text-yellow-400 fill-current mr-1" />
-                      <span className="text-sm text-dark-text-secondary">{printer.rating}</span>
+                      <span className="text-sm text-theme-text-secondary">{printer.rating}</span>
                     </div>
-                    <span className="text-xs text-dark-text-muted">({printer.totalJobs} jobs)</span>
+                    <span className="text-xs text-theme-text-muted">({printer.totalJobs} jobs)</span>
                   </div>
                   <GlassButton
                     onClick={() => handlePrintRequest(printer)}
@@ -221,99 +164,85 @@ export const PrintersPage: React.FC = () => {
 
         {filteredPrinters.length === 0 && (
           <GlassCard className="p-12 text-center">
-            <Printer size={48} className="mx-auto text-dark-text-muted mb-4" />
-            <h3 className="text-lg font-medium text-dark-text mb-2">No printers found</h3>
-            <p className="text-dark-text-secondary">
+            <Printer size={48} className="mx-auto text-theme-text-muted mb-4" />
+            <h3 className="text-lg font-medium text-theme-text mb-2">No printers found</h3>
+            <p className="text-theme-text-secondary">
               Try adjusting your search criteria or check back later for new printers.
             </p>
           </GlassCard>
         )}
 
         {/* Upload Modal */}
-        {showUploadModal && selectedPrinter && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <GlassCard className="w-full max-w-lg">
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-4">Print to {selectedPrinter.name}</h3>
-                
-                <div className="p-4 bg-glass-bg rounded-component mb-6">
-                  <h4 className="font-medium text-dark-text mb-2">Printer Details</h4>
-                  <div className="space-y-1 text-sm text-dark-text-secondary">
-                    <p><strong>Location:</strong> {selectedPrinter.location.hall} {selectedPrinter.location.room}</p>
-                    <p><strong>B&W Price:</strong> ${selectedPrinter.pricePerPageBW}/page</p>
-                    {selectedPrinter.pricePerPageColor > 0 && (
-                      <p><strong>Color Price:</strong> ${selectedPrinter.pricePerPageColor}/page</p>
-                    )}
-                    <p><strong>Features:</strong> {selectedPrinter.specifications.features.join(', ')}</p>
-                  </div>
-                </div>
-                
-                <div className="border-2 border-dashed border-glass-border rounded-component p-8 text-center mb-6">
-                  {selectedFiles.length > 0 ? (
-                    <div className="space-y-4">
-                      <h4 className="text-lg font-medium text-dark-text">Selected Files</h4>
-                      {selectedFiles.map((file, index) => (
-                        <div key={index} className="flex items-center justify-between bg-glass-bg p-3 rounded-component">
-                          <span className="text-sm text-dark-text truncate">{file.name}</span>
-                          <GlassButton
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => setSelectedFiles(prev => prev.filter((_, i) => i !== index))}
-                          >
-                            <X size={16} />
-                          </GlassButton>
-                        </div>
-                      ))}
-                      <GlassButton variant="secondary" onClick={() => fileInputRef.current?.click()}>
-                        Add More Files
-                      </GlassButton>
-                    </div>
-                  ) : (
-                    <>
-                      <Upload size={48} className="mx-auto text-dark-text-muted mb-4" />
-                      <h4 className="text-lg font-medium text-dark-text mb-2">Upload Document</h4>
-                      <p className="text-sm text-dark-text-secondary mb-4">
-                        Drag and drop your files here, or click to browse
-                      </p>
-                      <GlassButton variant="secondary" onClick={() => fileInputRef.current?.click()}>
-                        Browse Files
-                      </GlassButton>
-                    </>
-                  )}
-                </div>
+        <Modal
+          isOpen={showUploadModal}
+          onClose={() => setShowUploadModal(false)}
+          title={`Print to ${selectedPrinter?.name}`}
+          size="lg"
+        >
+          <div className="space-y-6">
+            <div className="p-4 bg-glass-bg rounded-component">
+              <h4 className="font-medium text-theme-text mb-2">Printer Details</h4>
+              <div className="space-y-1 text-sm text-theme-text-secondary">
+                <p><strong>Location:</strong> {selectedPrinter?.location.hall} {selectedPrinter?.location.room}</p>
+                <p><strong>B&W Price:</strong> ${selectedPrinter?.pricePerPageBW}/page</p>
+                {selectedPrinter?.pricePerPageColor && selectedPrinter.pricePerPageColor > 0 && (
+                  <p><strong>Color Price:</strong> ${selectedPrinter.pricePerPageColor}/page</p>
+                )}
+                <p><strong>Features:</strong> {selectedPrinter?.specifications.features.join(', ')}</p>
+              </div>
+            </div>
+            
+            <FileUpload
+              onFilesChange={setUploadedFiles}
+              acceptedTypes=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              multiple={true}
+            />
+            
+            {selectedPrinter?.type !== 'bw' && selectedPrinter?.pricePerPageColor && selectedPrinter.pricePerPageColor > 0 && (
+              <div className="flex items-center space-x-3">
                 <input
-                  type="file"
-                  multiple
-                  accept=".pdf,.docx"
-                  className="hidden"
-                  id="file-upload"
-                  ref={fileInputRef}
-                  onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))}
+                  type="checkbox"
+                  id="color-print"
+                  checked={colorPrint}
+                  onChange={(e) => setColorPrint(e.target.checked)}
+                  className="w-4 h-4 text-campus-green bg-glass-bg border-glass-border rounded focus:ring-campus-green"
                 />
-                
-                <div className="flex gap-3">
-                  <GlassButton
-                    variant="secondary"
-                    onClick={() => setShowUploadModal(false)}
-                    className="flex-1"
-                  >
-                    Cancel
-                  </GlassButton>
-                  <GlassButton
-                    variant="primary"
-                    onClick={() => {
-                      alert('Print job submitted successfully!');
-                      setShowUploadModal(false);
-                    }}
-                    className="flex-1"
-                  >
-                    Submit Print Job
-                  </GlassButton>
+                <label htmlFor="color-print" className="text-sm font-medium text-theme-text">
+                  Color Print (+${((selectedPrinter?.pricePerPageColor || 0) - (selectedPrinter?.pricePerPageBW || 0)).toFixed(2)}/page)
+                </label>
+              </div>
+            )}
+            
+            {uploadedFiles.length > 0 && (
+              <div className="p-4 bg-glass-bg rounded-component">
+                <h4 className="font-medium text-theme-text mb-2">Print Summary</h4>
+                <div className="space-y-1 text-sm text-theme-text-secondary">
+                  <p><strong>Files:</strong> {uploadedFiles.length}</p>
+                  <p><strong>Print Type:</strong> {colorPrint ? 'Color' : 'Black & White'}</p>
+                  <p><strong>Estimated Cost:</strong> ${(uploadedFiles.length * (colorPrint ? selectedPrinter?.pricePerPageColor || 0 : selectedPrinter?.pricePerPageBW || 0)).toFixed(2)}</p>
                 </div>
               </div>
-            </GlassCard>
+            )}
+            
+            <div className="flex gap-3">
+              <GlassButton
+                variant="secondary"
+                onClick={() => setShowUploadModal(false)}
+                className="flex-1"
+              >
+                Cancel
+              </GlassButton>
+              <GlassButton
+                variant="primary"
+                onClick={handleSubmitPrintJob}
+                className="flex-1"
+                disabled={uploadedFiles.length === 0}
+              >
+                Submit Print Job
+              </GlassButton>
+            </div>
           </div>
-        )}
+        </Modal>
       </div>
     </div>
   );

@@ -1,0 +1,43 @@
+{
+  "users": [
+    {
+      "id": "user-1",
+      "email": "student@campus.edu",
+      "username": "student123",
+      "firstName": "Javier",
+      "lastName": "Student",
+      "profilePicture": "https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg?auto=compress&cs=tinysrgb&w=100",
+      "credits": 45.50,
+      "roles": ["user"],
+      "university": "Campus University",
+      "hall": "Residence Hall A",
+      "createdAt": "2024-01-15T10:30:00Z"
+    },
+    {
+      "id": "user-2",
+      "email": "owner@campus.edu",
+      "username": "printerowner",
+      "firstName": "John",
+      "lastName": "Owner",
+      "profilePicture": "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=100",
+      "credits": 250.75,
+      "roles": ["printer-owner", "user"],
+      "university": "Campus University",
+      "hall": "Engineering Hall",
+      "createdAt": "2024-01-10T08:15:00Z"
+    },
+    {
+      "id": "admin-1",
+      "email": "admin@campus.edu",
+      "username": "admin",
+      "firstName": "Admin",
+      "lastName": "User",
+      "profilePicture": "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100",
+      "credits": 1000.00,
+      "roles": ["admin", "printer-owner", "user"],
+      "university": "Campus University",
+      "hall": "Admin Building",
+      "createdAt": "2024-01-01T00:00:00Z"
+    }
+  ]
+}

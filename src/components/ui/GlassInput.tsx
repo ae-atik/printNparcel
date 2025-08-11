@@ -39,7 +39,7 @@ export const GlassInput: React.FC<GlassInputProps> = ({
         <input
           id={inputId}
           className={cn(
-            'peer w-full px-4 py-3 bg-glass-bg backdrop-blur-glass border border-glass-border rounded-component text-dark-text placeholder-transparent focus:outline-none focus:border-campus-green focus:shadow-glow transition-all duration-300',
+            'peer w-full px-4 py-3 bg-glass-bg backdrop-blur-glass border border-glass-border rounded-component text-theme-text placeholder-transparent focus:outline-none focus:border-campus-green focus:shadow-glow transition-all duration-300',
             icon && 'pl-10',
             error && 'border-danger focus:border-danger focus:shadow-none',
             className
@@ -56,8 +56,8 @@ export const GlassInput: React.FC<GlassInputProps> = ({
               'absolute left-4 transition-all duration-300 pointer-events-none',
               icon && 'left-10',
               (isFocused || hasValue || props.value) 
-                ? 'top-0 text-xs bg-dark-bg px-2 -translate-y-1/2 text-campus-green'
-                : 'top-1/2 text-base -translate-y-1/2 text-dark-text-muted',
+                ? 'top-0 text-xs bg-theme-bg px-2 -translate-y-1/2 text-campus-green'
+                : 'top-1/2 text-base -translate-y-1/2 text-theme-text-muted',
               error && 'text-danger'
             )}
           >
@@ -68,7 +68,7 @@ export const GlassInput: React.FC<GlassInputProps> = ({
       {(helperText || error) && (
         <p className={cn(
           'mt-2 text-sm',
-          error ? 'text-danger' : 'text-dark-text-secondary'
+          error ? 'text-danger' : 'text-theme-text-secondary'
         )}>
           {error || helperText}
         </p>

@@ -1,0 +1,64 @@
+{
+  "activities": {
+    "user": [
+      {
+        "id": 1,
+        "action": "Printed lecture notes",
+        "time": "2 hours ago",
+        "status": "completed"
+      },
+      {
+        "id": 2,
+        "action": "Uploaded research paper",
+        "time": "1 day ago",
+        "status": "pending"
+      },
+      {
+        "id": 3,
+        "action": "Added $20 credits",
+        "time": "3 days ago",
+        "status": "completed"
+      }
+    ],
+    "printer-owner": [
+      {
+        "id": 1,
+        "action": "Job completed - Biology notes",
+        "time": "30 minutes ago",
+        "status": "completed"
+      },
+      {
+        "id": 2,
+        "action": "New print request",
+        "time": "1 hour ago",
+        "status": "pending"
+      },
+      {
+        "id": 3,
+        "action": "Printer maintenance completed",
+        "time": "2 hours ago",
+        "status": "completed"
+      }
+    ],
+    "admin": [
+      {
+        "id": 1,
+        "action": "New printer registered",
+        "time": "1 hour ago",
+        "status": "pending"
+      },
+      {
+        "id": 2,
+        "action": "User report resolved",
+        "time": "2 hours ago",
+        "status": "completed"
+      },
+      {
+        "id": 3,
+        "action": "System maintenance completed",
+        "time": "1 day ago",
+        "status": "completed"
+      }
+    ]
+  }
+}

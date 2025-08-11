@@ -57,7 +57,7 @@ export const SignupPage: React.FC = () => {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold gradient-text">Join CampusPrint</h2>
-          <p className="mt-2 text-dark-text-secondary">Create your account to get started</p>
+          <p className="mt-2 text-theme-text-secondary">Create your account to get started</p>
         </div>
 
         <GlassCard className="p-8">
@@ -136,7 +136,7 @@ export const SignupPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-dark-text-muted hover:text-dark-text transition-colors"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-theme-text-muted hover:text-theme-text transition-colors"
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -155,7 +155,7 @@ export const SignupPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-dark-text-muted hover:text-dark-text transition-colors"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-theme-text-muted hover:text-theme-text transition-colors"
               >
                 {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
@@ -173,7 +173,7 @@ export const SignupPage: React.FC = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-dark-text-secondary">
+            <p className="text-theme-text-secondary">
               Already have an account?{' '}
               <Link to="/login" className="text-campus-green hover:text-campus-green-hover font-medium">
                 Sign in

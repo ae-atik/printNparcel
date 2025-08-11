@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, User, CreditCard, LogOut, Settings, UserPlus } from 'lucide-react';
+import { Menu, X, User, CreditCard, LogOut, Settings, UserPlus, Edit } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { GlassButton } from '../ui/GlassButton';
 import { GlassCard } from '../ui/GlassCard';
+import { ThemeToggle } from '../ui/ThemeToggle';
+import { ProfileEditor } from '../ui/ProfileEditor';
 import { cn } from '../../utils/cn';
 
 export const Header: React.FC = () => {
   const { user, isAuthenticated, logout, currentRole, switchRole } = useAuth();
+  const { isDark } = useTheme();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showProfileEditor, setShowProfileEditor] = useState(false);
   const navigate = useNavigate();
 
   const handleRoleSwitch = (role: any) => {
@@ -49,6 +54,8 @@ export const Header: React.FC = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
+            <ThemeToggle />
+            
             {isAuthenticated ? (
               <>
                 {/* Credit Balance */}
@@ -78,16 +85,16 @@ export const Header: React.FC = () => {
                   </button>
 
                   {isProfileMenuOpen && (
-                    <GlassCard className="absolute right-0 mt-2 w-64 py-2 z-50" padding="none">
+                    <div className="absolute right-0 mt-2 w-64 py-2 z-50 bg-glass-bg/90 backdrop-blur-xl border border-glass-border rounded-glass shadow-glass-hover">
                       <div className="px-4 py-3 border-b border-glass-border">
                         <p className="text-sm font-medium">{user?.firstName} {user?.lastName}</p>
-                        <p className="text-xs text-dark-text-secondary">{user?.email}</p>
+                        <p className="text-xs text-theme-text-secondary">{user?.email}</p>
                         <p className="text-xs text-campus-green mt-1">Current: {currentRole}</p>
                       </div>
                       
                       {user?.roles && user.roles.length > 1 && (
                         <div className="px-4 py-2 border-b border-glass-border">
-                          <p className="text-xs text-dark-text-secondary mb-2">Switch Role:</p>
+                          <p className="text-xs text-theme-text-secondary mb-2">Switch Role:</p>
                           {user.roles.map((role) => (
                             <button
                               key={role}
@@ -104,6 +111,16 @@ export const Header: React.FC = () => {
                       )}
                       
                       <div className="py-1">
+                        <button
+                          onClick={() => {
+                            setShowProfileEditor(true);
+                            setIsProfileMenuOpen(false);
+                          }}
+                          className="flex items-center w-full px-4 py-2 text-sm hover:bg-glass-hover transition-colors"
+                        >
+                          <Edit size={16} className="mr-2" />
+                          Edit Profile
+                        </button>
                         <Link
                           to="/dashboard"
                           className="flex items-center px-4 py-2 text-sm hover:bg-glass-hover transition-colors"
@@ -120,7 +137,7 @@ export const Header: React.FC = () => {
                           Sign Out
                         </button>
                       </div>
-                    </GlassCard>
+                    </div>
                   )}
                 </div>
               </>
@@ -155,6 +172,11 @@ export const Header: React.FC = () => {
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-glass-border">
+            <div className="flex justify-between items-center px-2 py-2 mb-3">
+              <span className="text-sm font-medium text-theme-text">Theme</span>
+              <ThemeToggle />
+            </div>
+            
             {isAuthenticated ? (
               <div className="space-y-3">
                 <div className="flex items-center space-x-3 px-2 py-2">
@@ -171,7 +193,7 @@ export const Header: React.FC = () => {
                   )}
                   <div>
                     <p className="font-medium">{user?.username}</p>
-                    <p className="text-sm text-dark-text-secondary">${user?.credits.toFixed(2)}</p>
+                    <p className="text-sm text-theme-text-secondary">${user?.credits.toFixed(2)}</p>
                   </div>
                 </div>
                 <Link
@@ -186,6 +208,15 @@ export const Header: React.FC = () => {
                   className="block w-full text-left px-2 py-2 text-sm hover:bg-glass-hover rounded-component transition-colors text-danger"
                 >
                   Sign Out
+                </button>
+                <button
+                  onClick={() => {
+                    setShowProfileEditor(true);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block w-full text-left px-2 py-2 text-sm hover:bg-glass-hover rounded-component transition-colors"
+                >
+                  Edit Profile
                 </button>
               </div>
             ) : (
@@ -216,6 +247,11 @@ export const Header: React.FC = () => {
           </div>
         )}
       </div>
+
+      <ProfileEditor
+        isOpen={showProfileEditor}
+        onClose={() => setShowProfileEditor(false)}
+      />
     </header>
   );
 };

@@ -22,10 +22,10 @@ export const GlassButton: React.FC<GlassButtonProps> = ({
   
   const variants = {
     primary: 'bg-campus-green text-white hover:bg-campus-green-hover focus:ring-campus-green shadow-lg hover:shadow-xl',
-    secondary: 'bg-glass-bg border border-glass-border text-dark-text hover:bg-glass-hover focus:ring-campus-green',
+    secondary: 'bg-glass-bg border border-glass-border text-theme-text hover:bg-glass-hover focus:ring-campus-green',
     success: 'bg-success text-white hover:bg-green-600 focus:ring-success shadow-lg hover:shadow-xl',
     danger: 'bg-danger text-white hover:bg-red-600 focus:ring-danger shadow-lg hover:shadow-xl',
-    ghost: 'text-dark-text hover:bg-glass-bg focus:ring-campus-green',
+    ghost: 'text-theme-text hover:bg-glass-bg focus:ring-campus-green',
   };
 
   const sizes = {

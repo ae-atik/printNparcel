@@ -1,0 +1,104 @@
+{
+  "printers": [
+    {
+      "id": "printer-1",
+      "name": "QuickPrint Pro",
+      "ownerId": "user-2",
+      "ownerName": "John Owner",
+      "type": "both",
+      "pricePerPageBW": 0.10,
+      "pricePerPageColor": 0.25,
+      "location": {
+        "university": "Campus University",
+        "hall": "Library",
+        "room": "2nd Floor"
+      },
+      "specifications": {
+        "brand": "HP",
+        "model": "LaserJet Pro",
+        "paperSizes": ["A4", "Letter", "Legal"],
+        "features": ["Duplex", "Stapling"]
+      },
+      "status": "online",
+      "isApproved": true,
+      "rating": 4.8,
+      "totalJobs": 1250,
+      "createdAt": "2024-01-05T12:00:00Z"
+    },
+    {
+      "id": "printer-2",
+      "name": "Student Center Printer",
+      "ownerId": "user-2",
+      "ownerName": "Print Hub LLC",
+      "type": "bw",
+      "pricePerPageBW": 0.08,
+      "pricePerPageColor": 0,
+      "location": {
+        "university": "Campus University",
+        "hall": "Student Union",
+        "room": "Ground Floor"
+      },
+      "specifications": {
+        "brand": "Canon",
+        "model": "ImageRunner",
+        "paperSizes": ["A4", "Letter"],
+        "features": ["Duplex"]
+      },
+      "status": "online",
+      "isApproved": true,
+      "rating": 4.5,
+      "totalJobs": 890,
+      "createdAt": "2024-01-08T14:30:00Z"
+    },
+    {
+      "id": "printer-3",
+      "name": "Engineering Lab Printer",
+      "ownerId": "user-2",
+      "ownerName": "TechPrint Solutions",
+      "type": "color",
+      "pricePerPageBW": 0.12,
+      "pricePerPageColor": 0.30,
+      "location": {
+        "university": "Campus University",
+        "hall": "Engineering Building",
+        "room": "Room 205"
+      },
+      "specifications": {
+        "brand": "Epson",
+        "model": "WorkForce Pro",
+        "paperSizes": ["A4", "Letter", "A3"],
+        "features": ["Color", "High Resolution"]
+      },
+      "status": "busy",
+      "isApproved": true,
+      "rating": 4.9,
+      "totalJobs": 650,
+      "createdAt": "2024-01-12T09:45:00Z"
+    },
+    {
+      "id": "printer-4",
+      "name": "Pending Approval Printer",
+      "ownerId": "user-2",
+      "ownerName": "John Owner",
+      "type": "color",
+      "pricePerPageBW": 0.12,
+      "pricePerPageColor": 0.30,
+      "location": {
+        "university": "Campus University",
+        "hall": "Engineering Building",
+        "room": "Room 205"
+      },
+      "specifications": {
+        "brand": "Canon",
+        "model": "PIXMA Pro",
+        "paperSizes": ["A4", "Letter"],
+        "features": ["Color", "High Resolution"]
+      },
+      "status": "offline",
+      "isApproved": false,
+      "rating": 0,
+      "totalJobs": 0,
+      "createdAt": "2024-01-20T16:20:00Z"
+    }
+  ]
+}

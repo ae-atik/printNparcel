@@ -1,0 +1,99 @@
+{
+  "deliveries": [
+    {
+      "id": "delivery-1",
+      "userId": "user-1",
+      "userName": "Sarah Johnson",
+      "userProfilePicture": "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100",
+      "items": [
+        {
+          "name": "Lecture Notes",
+          "quantity": 1,
+          "description": "15 pages, printed documents",
+          "image": "https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=200"
+        },
+        {
+          "name": "Assignment Sheet",
+          "quantity": 1,
+          "description": "2 pages"
+        }
+      ],
+      "pickupLocation": {
+        "university": "Campus University",
+        "hall": "Library",
+        "room": "Printing Station"
+      },
+      "deliveryLocation": {
+        "university": "Campus University",
+        "hall": "Residence Hall B",
+        "room": "204"
+      },
+      "payment": 8.50,
+      "status": "pending",
+      "createdAt": "2024-01-21T10:00:00Z",
+      "urgency": "medium"
+    },
+    {
+      "id": "delivery-2",
+      "userId": "user-2",
+      "userName": "Mike Chen",
+      "userProfilePicture": "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=100",
+      "items": [
+        {
+          "name": "Research Paper",
+          "quantity": 1,
+          "description": "25 pages, color printed",
+          "image": "https://images.pexels.com/photos/590016/pexels-photo-590016.jpeg?auto=compress&cs=tinysrgb&w=200"
+        },
+        {
+          "name": "Bibliography",
+          "quantity": 1,
+          "description": "5 pages"
+        }
+      ],
+      "pickupLocation": {
+        "university": "Campus University",
+        "hall": "Engineering Building",
+        "room": "Print Lab"
+      },
+      "deliveryLocation": {
+        "university": "Campus University",
+        "hall": "Library",
+        "room": "Study Room 12"
+      },
+      "payment": 12.00,
+      "status": "pending",
+      "createdAt": "2024-01-21T11:00:00Z",
+      "urgency": "high"
+    },
+    {
+      "id": "delivery-3",
+      "userId": "user-3",
+      "userName": "Emma Davis",
+      "userProfilePicture": "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=100",
+      "items": [
+        {
+          "name": "Class Handouts",
+          "quantity": 1,
+          "description": "8 pages",
+          "image": "https://images.pexels.com/photos/301920/pexels-photo-301920.jpeg?auto=compress&cs=tinysrgb&w=200"
+        }
+      ],
+      "pickupLocation": {
+        "university": "Campus University",
+        "hall": "Student Union",
+        "room": "Print Center"
+      },
+      "deliveryLocation": {
+        "university": "Campus University",
+        "hall": "Student Union",
+        "room": "Café"
+      },
+      "payment": 6.75,
+      "status": "accepted",
+      "acceptedBy": "delivery-person-1",
+      "createdAt": "2024-01-21T11:30:00Z",
+      "urgency": "low"
+    }
+  ]
+}

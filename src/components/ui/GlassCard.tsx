@@ -33,7 +33,7 @@ export const GlassCard: React.FC<GlassCardProps> = ({
       className={cn(
         'bg-glass-bg border border-glass-border rounded-glass shadow-glass transition-all duration-300',
         blurClasses[blur],
-        hover && 'hover:bg-glass-hover hover:shadow-glass-hover hover:scale-105',
+      hover && 'hover:bg-glass-hover hover:shadow-glass-hover hover:scale-[1.02]',
         paddingClasses[padding],
         className
       )}

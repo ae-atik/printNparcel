@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { MapPin, DollarSign, Printer, Upload, Filter, Search, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { MapPin, DollarSign, Printer, Upload, Filter, Search } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -99,9 +99,6 @@ export const Printers: React.FC = () => {
     setIsUploadModalOpen(false);
     setSelectedPrinter(null);
   };
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
   return (
     <div className="space-y-6">
@@ -210,47 +207,24 @@ export const Printers: React.FC = () => {
           </div>
           
           <div className="border-2 border-dashed border-gray-300 rounded-component p-8 text-center">
-            {selectedFiles.length > 0 ? (
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium text-gray-900">Selected Files</h3>
-                {selectedFiles.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded">
-                    <span className="text-sm text-gray-900 truncate">{file.name}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setSelectedFiles(prev => prev.filter((_, i) => i !== index))}
-                    >
-                      <X size={16} />
-                    </Button>
-                  </div>
-                ))}
-                <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
-                  Add More Files
-                </Button>
-              </div>
-            ) : (
-              <>
-                <Upload size={48} className="mx-auto text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Upload Document</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Drag and drop your files here, or click to browse
-                </p>
-                <Button variant="secondary" onClick={() => fileInputRef.current?.click()}>
-                  Browse Files
-                </Button>
-              </>
-            )}
+            <Upload size={48} className="mx-auto text-gray-400 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Upload Document</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Drag and drop your files here, or click to browse
+            </p>
+            <input
+              type="file"
+              multiple
+              accept=".pdf,.doc,.docx,.txt"
+              className="hidden"
+              id="file-upload"
+            />
+            <label htmlFor="file-upload">
+              <Button as="span" variant="secondary">
+                Browse Files
+              </Button>
+            </label>
           </div>
-          <input
-            type="file"
-            multiple
-            accept=".pdf,.docx"
-            className="hidden"
-            id="file-upload"
-            ref={fileInputRef}
-            onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))}
-          />
           
           <div className="flex gap-3">
             <Button

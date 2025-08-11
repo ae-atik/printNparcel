@@ -1,0 +1,28 @@
+{
+  "reviews": [
+    {
+      "id": "1",
+      "name": "Sarah Johnson",
+      "avatar": "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100",
+      "rating": 5,
+      "comment": "Amazing service! Got my documents printed and delivered within an hour. The quality was perfect.",
+      "serviceType": "printing"
+    },
+    {
+      "id": "2",
+      "name": "Mike Chen",
+      "avatar": "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=100",
+      "rating": 5,
+      "comment": "Love being a printer owner on this platform. Great way to earn extra income with my printer.",
+      "serviceType": "printing"
+    },
+    {
+      "id": "3",
+      "name": "Emma Davis",
+      "avatar": "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=100",
+      "rating": 4,
+      "comment": "Delivery service is super convenient. Perfect for when I'm stuck in the library studying.",
+      "serviceType": "delivery"
+    }
+  ]
+}

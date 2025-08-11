@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { cn } from '../../utils/cn';
+import { GlassCard } from './GlassCard';
 
 interface ModalProps {
   isOpen: boolean;
@@ -58,21 +59,22 @@ export const Modal: React.FC<ModalProps> = ({
   const modalContent = (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div 
-        className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm" 
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm" 
         onClick={onClose}
       />
-      <div 
+      <GlassCard 
         className={cn(
-          'relative bg-white rounded-component shadow-xl w-full',
+          'relative w-full max-h-[90vh] overflow-y-auto',
           sizeClasses[size]
         )}
+        padding="none"
       >
         {title && (
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h2 className="text-h2 font-semibold text-charcoal">{title}</h2>
+          <div className="flex items-center justify-between p-6 border-b border-glass-border">
+            <h2 className="text-xl font-semibold text-theme-text">{title}</h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-theme-text-muted hover:text-theme-text transition-colors p-1 rounded-component hover:bg-glass-hover"
             >
               <X size={24} />
             </button>
@@ -81,7 +83,7 @@ export const Modal: React.FC<ModalProps> = ({
         <div className="p-6">
           {children}
         </div>
-      </div>
+      </GlassCard>
     </div>
   );
 

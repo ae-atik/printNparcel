@@ -1,22 +1,23 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        // Dark theme colors
-        'dark-bg': '#0a0a0a',
-        'dark-surface': '#1a1a1a',
-        'dark-card': '#2a2a2a',
-        'dark-border': '#3a3a3a',
-        'dark-text': '#ffffff',
-        'dark-text-secondary': '#a0a0a0',
-        'dark-text-muted': '#666666',
+        // Theme colors
+        'theme-bg': 'var(--theme-bg)',
+        'theme-surface': 'var(--theme-surface)',
+        'theme-card': 'var(--theme-card)',
+        'theme-border': 'var(--theme-border)',
+        'theme-text': 'var(--theme-text)',
+        'theme-text-secondary': 'var(--theme-text-secondary)',
+        'theme-text-muted': 'var(--theme-text-muted)',
         
         // Glassmorphic colors
-        'glass-bg': 'rgba(255, 255, 255, 0.05)',
-        'glass-border': 'rgba(255, 255, 255, 0.1)',
-        'glass-hover': 'rgba(255, 255, 255, 0.08)',
+        'glass-bg': 'var(--glass-bg)',
+        'glass-border': 'var(--glass-border)',
+        'glass-hover': 'var(--glass-hover)',
         
         // Brand colors
         'campus-green': '#34A853',
@@ -28,6 +29,24 @@ export default {
         'warning': '#F59E0B',
         'danger': '#EF4444',
         'info': '#3B82F6',
+        
+        // Light theme specific
+        'light-bg': '#F7F8FA',
+        'light-surface': '#FFFFFF',
+        'light-card': '#FFFFFF',
+        'light-border': '#E5E7EB',
+        'light-text': '#2D3436',
+        'light-text-secondary': '#6B7280',
+        'light-text-muted': '#9CA3AF',
+        
+        // Dark theme specific
+        'dark-bg': '#0a0a0a',
+        'dark-surface': '#1a1a1a',
+        'dark-card': '#2a2a2a',
+        'dark-border': '#3a3a3a',
+        'dark-text': '#ffffff',
+        'dark-text-secondary': '#a0a0a0',
+        'dark-text-muted': '#666666',
       },
       fontFamily: {
         sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif'],

@@ -5,6 +5,7 @@ import { GlassButton } from '../components/ui/GlassButton';
 import { GlassInput } from '../components/ui/GlassInput';
 import { FloatingActionButton } from '../components/ui/FloatingActionButton';
 import { DeliveryRequest } from '../types';
+import deliveriesData from '../data/deliveries.json';
 
 export const DeliveryPage: React.FC = () => {
   const [filter, setFilter] = useState<'all' | 'pending' | 'accepted' | 'completed'>('all');
@@ -20,80 +21,7 @@ export const DeliveryPage: React.FC = () => {
     requestedTime: '',
   });
 
-  const deliveryRequests: DeliveryRequest[] = [
-    {
-      id: '1',
-      userId: 'user-1',
-      userName: 'Sarah Johnson',
-      userProfilePicture: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100',
-      items: [
-        { name: 'Lecture Notes', quantity: 1, description: '15 pages, printed documents' },
-        { name: 'Assignment Sheet', quantity: 1, description: '2 pages' },
-      ],
-      pickupLocation: {
-        university: 'Campus University',
-        hall: 'Library',
-        room: 'Printing Station',
-      },
-      deliveryLocation: {
-        university: 'Campus University',
-        hall: 'Residence Hall B',
-        room: '204',
-      },
-      payment: 8.50,
-      status: 'pending',
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-      urgency: 'medium',
-    },
-    {
-      id: '2',
-      userId: 'user-2',
-      userName: 'Mike Chen',
-      userProfilePicture: 'https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=100',
-      items: [
-        { name: 'Research Paper', quantity: 1, description: '25 pages, color printed' },
-        { name: 'Bibliography', quantity: 1, description: '5 pages' },
-      ],
-      pickupLocation: {
-        university: 'Campus University',
-        hall: 'Engineering Building',
-        room: 'Print Lab',
-      },
-      deliveryLocation: {
-        university: 'Campus University',
-        hall: 'Library',
-        room: 'Study Room 12',
-      },
-      payment: 12.00,
-      status: 'pending',
-      createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
-      urgency: 'high',
-    },
-    {
-      id: '3',
-      userId: 'user-3',
-      userName: 'Emma Davis',
-      userProfilePicture: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=100',
-      items: [
-        { name: 'Class Handouts', quantity: 1, description: '8 pages' },
-      ],
-      pickupLocation: {
-        university: 'Campus University',
-        hall: 'Student Union',
-        room: 'Print Center',
-      },
-      deliveryLocation: {
-        university: 'Campus University',
-        hall: 'Student Union',
-        room: 'Café',
-      },
-      payment: 6.75,
-      status: 'accepted',
-      acceptedBy: 'delivery-person-1',
-      createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
-      urgency: 'low',
-    },
-  ];
+  const deliveryRequests: DeliveryRequest[] = deliveriesData.deliveries;
 
   const filteredDeliveries = deliveryRequests.filter(delivery => {
     if (filter === 'all') return true;
@@ -159,7 +87,7 @@ export const DeliveryPage: React.FC = () => {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold gradient-text mb-2">Delivery Requests</h1>
-          <p className="text-dark-text-secondary">Accept delivery requests and earn money</p>
+          <p className="text-theme-text-secondary">Accept delivery requests and earn money</p>
         </div>
 
         {/* Filter Tabs */}
@@ -172,7 +100,7 @@ export const DeliveryPage: React.FC = () => {
                 className={`px-4 py-2 rounded-component text-sm font-medium transition-colors ${
                   filter === status
                     ? 'bg-campus-green text-white'
-                    : 'text-dark-text-secondary hover:text-dark-text hover:bg-glass-hover'
+                    : 'text-theme-text-secondary hover:text-theme-text hover:bg-glass-hover'
                 }`}
               >
                 {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -193,7 +121,7 @@ export const DeliveryPage: React.FC = () => {
                 />
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="font-semibold text-dark-text">{delivery.userName}</h3>
+                    <h3 className="font-semibold text-theme-text">{delivery.userName}</h3>
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       delivery.status === 'completed' ? 'bg-success/10 text-success' :
                       delivery.status === 'accepted' ? 'bg-info/10 text-info' :
@@ -204,12 +132,12 @@ export const DeliveryPage: React.FC = () => {
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       delivery.urgency === 'high' ? 'bg-danger/10 text-danger' :
                       delivery.urgency === 'medium' ? 'bg-warning/10 text-warning' :
-                      'bg-glass-bg text-dark-text-secondary'
+                      'bg-glass-bg text-theme-text-secondary'
                     }`}>
                       {delivery.urgency} priority
                     </span>
                   </div>
-                  <p className="text-sm text-dark-text-secondary">
+                  <p className="text-sm text-theme-text-secondary">
                     <Clock size={14} className="inline mr-1" />
                     {formatTimeAgo(delivery.createdAt)}
                   </p>
@@ -217,7 +145,7 @@ export const DeliveryPage: React.FC = () => {
               </div>
               
               <div className="space-y-3 mb-4">
-                <div className="flex items-start text-sm text-dark-text-secondary">
+                <div className="flex items-start text-sm text-theme-text-secondary">
                   <MapPin size={16} className="mr-2 mt-0.5 flex-shrink-0" />
                   <div>
                     <p><strong>Pickup:</strong> {delivery.pickupLocation.hall} {delivery.pickupLocation.room}</p>
@@ -226,14 +154,24 @@ export const DeliveryPage: React.FC = () => {
                 </div>
                 
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-dark-text">Items to deliver:</p>
+                  <p className="text-sm font-medium text-theme-text">Items to deliver:</p>
                   {delivery.items.map((item, index) => (
-                    <div key={index} className="flex items-center text-sm text-dark-text-secondary">
-                      <Package size={14} className="mr-2 flex-shrink-0" />
-                      <span>{item.quantity}x {item.name}</span>
-                      {item.description && (
-                        <span className="ml-2 text-dark-text-muted">({item.description})</span>
+                    <div key={index} className="flex items-center gap-3 text-sm text-theme-text-secondary">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-8 h-8 rounded object-cover flex-shrink-0"
+                        />
+                      ) : (
+                        <Package size={14} className="flex-shrink-0" />
                       )}
+                      <div>
+                        <span>{item.quantity}x {item.name}</span>
+                        {item.description && (
+                          <span className="ml-2 text-theme-text-muted">({item.description})</span>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -284,9 +222,9 @@ export const DeliveryPage: React.FC = () => {
 
         {filteredDeliveries.length === 0 && (
           <GlassCard className="p-12 text-center">
-            <Package size={48} className="mx-auto text-dark-text-muted mb-4" />
-            <h3 className="text-lg font-medium text-dark-text mb-2">No delivery requests found</h3>
-            <p className="text-dark-text-secondary">
+            <Package size={48} className="mx-auto text-theme-text-muted mb-4" />
+            <h3 className="text-lg font-medium text-theme-text mb-2">No delivery requests found</h3>
+            <p className="text-theme-text-secondary">
               {filter === 'all' 
                 ? 'No delivery requests available at the moment'
                 : `No ${filter} deliveries found`
@@ -311,7 +249,7 @@ export const DeliveryPage: React.FC = () => {
                 <div className="space-y-6">
                   {/* Items */}
                   <div>
-                    <h4 className="font-medium text-dark-text mb-3">Items to Deliver</h4>
+                    <h4 className="font-medium text-theme-text mb-3">Items to Deliver</h4>
                     {formData.items.map((item, index) => (
                       <div key={index} className="grid grid-cols-12 gap-3 mb-3">
                         <div className="col-span-5">
@@ -363,7 +301,7 @@ export const DeliveryPage: React.FC = () => {
                   {/* Locations */}
                   <div className="grid grid-cols-2 gap-6">
                     <div>
-                      <h4 className="font-medium text-dark-text mb-3">Pickup Location</h4>
+                      <h4 className="font-medium text-theme-text mb-3">Pickup Location</h4>
                       <div className="space-y-3">
                         <GlassInput
                           label="Hall"
@@ -378,7 +316,7 @@ export const DeliveryPage: React.FC = () => {
                       </div>
                     </div>
                     <div>
-                      <h4 className="font-medium text-dark-text mb-3">Delivery Location</h4>
+                      <h4 className="font-medium text-theme-text mb-3">Delivery Location</h4>
                       <div className="space-y-3">
                         <GlassInput
                           label="Hall"
@@ -404,11 +342,11 @@ export const DeliveryPage: React.FC = () => {
                       onChange={(e) => setFormData(prev => ({ ...prev, payment: e.target.value }))}
                     />
                     <div>
-                      <label className="block text-sm font-medium text-dark-text mb-2">Priority</label>
+                      <label className="block text-sm font-medium text-theme-text mb-2">Priority</label>
                       <select
                         value={formData.urgency}
                         onChange={(e) => setFormData(prev => ({ ...prev, urgency: e.target.value }))}
-                        className="w-full px-4 py-3 bg-glass-bg backdrop-blur-glass border border-glass-border rounded-component text-dark-text focus:outline-none focus:border-campus-green"
+                        className="w-full px-4 py-3 bg-glass-bg backdrop-blur-glass border border-glass-border rounded-component text-theme-text focus:outline-none focus:border-campus-green"
                       >
                         <option value="low">Low</option>
                         <option value="medium">Medium</option>
