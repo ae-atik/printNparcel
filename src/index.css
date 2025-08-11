@@ -11,9 +11,9 @@
   --theme-text: #2D3436;
   --theme-text-secondary: #6B7280;
   --theme-text-muted: #9CA3AF;
-  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-bg: rgba(255, 255, 255, 0.65);
   --glass-border: rgba(0, 0, 0, 0.1);
-  --glass-hover: rgba(255, 255, 255, 0.9);
+  --glass-hover: rgba(255, 255, 255, 0.68);
 }
 
 .dark {
@@ -25,9 +25,9 @@
   --theme-text: #ffffff;
   --theme-text-secondary: #a0a0a0;
   --theme-text-muted: #666666;
-  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-bg: rgba(26, 26, 26, 0.95);
   --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-hover: rgba(255, 255, 255, 0.08);
+  --glass-hover: rgba(38, 38, 38, 0.98);
 }
 
 @layer base {

@@ -243,7 +243,11 @@ export const DashboardPage: React.FC = () => {
               )}
               {currentRole === 'printer-owner' && (
                 <>
-                  <GlassButton variant="secondary" className="p-4 h-auto flex-col">
+                  <GlassButton
+                    variant="secondary"
+                    className="p-4 h-auto flex-col"
+                    onClick={() => navigate('/printers/add')}
+                  >
                     <Plus size={24} className="mb-2" />
                     <span className="font-medium">Add Printer</span>
                     <span className="text-xs text-theme-text-secondary">Register new printer</span>

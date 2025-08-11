@@ -3,29 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { Printer, Truck, Plus, Star, Users, Clock, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { Modal } from '../components/ui/Modal';
 import { GlassCard } from '../components/ui/GlassCard';
 import { GlassButton } from '../components/ui/GlassButton';
-import { GlassInput } from '../components/ui/GlassInput';
 import reviewsData from '../data/reviews.json';
 
 export const HomePage: React.FC = () => {
-  const { isAuthenticated, addRole } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { isDark } = useTheme();
   const navigate = useNavigate();
-  const [showPrinterModal, setShowPrinterModal] = useState(false);
-  const [printerFormData, setPrinterFormData] = useState({
-    name: '',
-    type: 'both',
-    pricePerPageBW: '',
-    pricePerPageColor: '',
-    brand: '',
-    model: '',
-    paperSizes: 'A4,Letter',
-    features: '',
-    hall: '',
-    room: '',
-  });
+  // Printer form state removed – handled in dedicated registration page now.
 
   const handleActionClick = (path: string) => {
     if (isAuthenticated) {
@@ -37,30 +23,13 @@ export const HomePage: React.FC = () => {
 
   const handleAddPrinter = () => {
     if (isAuthenticated) {
-      setShowPrinterModal(true);
+      navigate('/printers/add');
     } else {
-      navigate('/login', { state: { from: { pathname: '/dashboard' } } });
+      navigate('/login', { state: { from: { pathname: '/printers/add' } } });
     }
   };
 
-  const handlePrinterSubmit = () => {
-    // In real app, this would submit to API
-    addRole('printer-owner');
-    setShowPrinterModal(false);
-    alert('Printer application submitted! Admin will review and approve your printer.');
-    setPrinterFormData({
-      name: '',
-      type: 'both',
-      pricePerPageBW: '',
-      pricePerPageColor: '',
-      brand: '',
-      model: '',
-      paperSizes: 'A4,Letter',
-      features: '',
-      hall: '',
-      room: '',
-    });
-  };
+  // Printer submission handled in registration page
 
   return (
     <div className="min-h-screen pt-16 bg-theme-bg">
@@ -209,110 +178,7 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* Printer Application Modal */}
-      <Modal
-        isOpen={showPrinterModal}
-        onClose={() => setShowPrinterModal(false)}
-        title="Register Your Printer"
-        size="lg"
-      >
-        <div className="space-y-4">
-          <GlassInput
-            label="Printer Name"
-            value={printerFormData.name}
-            onChange={(e) => setPrinterFormData(prev => ({ ...prev, name: e.target.value }))}
-          />
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-theme-text mb-2">Printer Type</label>
-              <select
-                value={printerFormData.type}
-                onChange={(e) => setPrinterFormData(prev => ({ ...prev, type: e.target.value }))}
-                className="w-full px-4 py-3 bg-glass-bg backdrop-blur-glass border border-glass-border rounded-component text-theme-text focus:outline-none focus:border-campus-green"
-              >
-                <option value="color">Color Only</option>
-                <option value="bw">Black & White Only</option>
-                <option value="both">Both Color & B&W</option>
-              </select>
-            </div>
-            <GlassInput
-              label="B&W Price per Page ($)"
-              type="number"
-              step="0.01"
-              value={printerFormData.pricePerPageBW}
-              onChange={(e) => setPrinterFormData(prev => ({ ...prev, pricePerPageBW: e.target.value }))}
-            />
-          </div>
-
-          {printerFormData.type !== 'bw' && (
-            <GlassInput
-              label="Color Price per Page ($)"
-              type="number"
-              step="0.01"
-              value={printerFormData.pricePerPageColor}
-              onChange={(e) => setPrinterFormData(prev => ({ ...prev, pricePerPageColor: e.target.value }))}
-            />
-          )}
-
-          <div className="grid grid-cols-2 gap-4">
-            <GlassInput
-              label="Brand"
-              value={printerFormData.brand}
-              onChange={(e) => setPrinterFormData(prev => ({ ...prev, brand: e.target.value }))}
-            />
-            <GlassInput
-              label="Model"
-              value={printerFormData.model}
-              onChange={(e) => setPrinterFormData(prev => ({ ...prev, model: e.target.value }))}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <GlassInput
-              label="Hall"
-              value={printerFormData.hall}
-              onChange={(e) => setPrinterFormData(prev => ({ ...prev, hall: e.target.value }))}
-            />
-            <GlassInput
-              label="Room (Optional)"
-              value={printerFormData.room}
-              onChange={(e) => setPrinterFormData(prev => ({ ...prev, room: e.target.value }))}
-            />
-          </div>
-
-          <GlassInput
-            label="Paper Sizes (comma separated)"
-            value={printerFormData.paperSizes}
-            onChange={(e) => setPrinterFormData(prev => ({ ...prev, paperSizes: e.target.value }))}
-            helperText="e.g., A4, Letter, Legal"
-          />
-
-          <GlassInput
-            label="Features (comma separated)"
-            value={printerFormData.features}
-            onChange={(e) => setPrinterFormData(prev => ({ ...prev, features: e.target.value }))}
-            helperText="e.g., Duplex, Stapling, Hole Punch"
-          />
-
-          <div className="flex gap-4 pt-4">
-            <GlassButton
-              variant="secondary"
-              onClick={() => setShowPrinterModal(false)}
-              className="flex-1"
-            >
-              Cancel
-            </GlassButton>
-            <GlassButton
-              variant="primary"
-              onClick={handlePrinterSubmit}
-              className="flex-1"
-            >
-              Submit Application
-            </GlassButton>
-          </div>
-        </div>
-      </Modal>
+      {/* Registration moved to dedicated route */}
     </div>
   );
 };

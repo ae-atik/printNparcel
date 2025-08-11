@@ -14,8 +14,13 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredRole,
   requireAuth = true,
 }) => {
-  const { isAuthenticated, user, currentRole } = useAuth();
+  const { isAuthenticated, user, currentRole, isLoading } = useAuth();
   const location = useLocation();
+
+  if (isLoading) {
+    // You could replace this with a spinner component if desired
+    return null;
+  }
 
   if (requireAuth && !isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;

@@ -5,6 +5,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider } from './context/ToastContext';
 import { Header } from './components/layout/Header';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
+import { PublicRoute } from './components/layout/PublicRoute';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
@@ -13,6 +14,7 @@ import { PrintersPage } from './pages/PrintersPage';
 import { DeliveryPage } from './pages/DeliveryPage';
 import { AdminPage } from './pages/AdminPage';
 import { ComingSoonPage } from './pages/ComingSoonPage';
+import { PrinterRegisterPage } from './pages/PrinterRegisterPage';
 
 function App() {
   return (
@@ -24,8 +26,22 @@ function App() {
               <Header />
               <Routes>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/signup" element={<SignupPage />} />
+                <Route
+                  path="/login"
+                  element={
+                    <PublicRoute>
+                      <LoginPage />
+                    </PublicRoute>
+                  }
+                />
+                <Route
+                  path="/signup"
+                  element={
+                    <PublicRoute>
+                      <SignupPage />
+                    </PublicRoute>
+                  }
+                />
                 <Route
                   path="/dashboard"
                   element={
@@ -39,6 +55,16 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <PrintersPage />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Add Printer registration page */}
+                <Route
+                  path="/printers/add"
+                  element={
+                    <ProtectedRoute>
+                      <PrinterRegisterPage />
                     </ProtectedRoute>
                   }
                 />

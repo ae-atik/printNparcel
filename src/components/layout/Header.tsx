@@ -85,7 +85,7 @@ export const Header: React.FC = () => {
                   </button>
 
                   {isProfileMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-64 py-2 z-50 bg-glass-bg/90 backdrop-blur-xl border border-glass-border rounded-glass shadow-glass-hover">
+                    <div className="absolute right-0 mt-2 w-64 py-2 z-50 bg-glass-bg backdrop-blur-xl border border-glass-border rounded-glass shadow-glass-hover">
                       <div className="px-4 py-3 border-b border-glass-border">
                         <p className="text-sm font-medium">{user?.firstName} {user?.lastName}</p>
                         <p className="text-xs text-theme-text-secondary">{user?.email}</p>
