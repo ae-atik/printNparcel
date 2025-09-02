@@ -17,10 +17,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { isAuthenticated, user, currentRole, isLoading } = useAuth();
   const location = useLocation();
 
-  if (isLoading) {
-    // You could replace this with a spinner component if desired
-    return null;
-  }
+if (isLoading) {
+  return (
+    <div className="min-h-[40vh] flex items-center justify-center text-theme-text-secondary">
+      Loading…
+    </div>
+  );
+}
+
 
   if (requireAuth && !isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;

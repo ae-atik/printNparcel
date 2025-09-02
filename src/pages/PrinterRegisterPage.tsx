@@ -65,7 +65,7 @@ export const PrinterRegisterPage: React.FC = () => {
                 </select>
               </div>
               <GlassInput
-                label="B&W Price per Page ($)"
+                label="B&W Price per Page (৳)"
                 name="pricePerPageBW"
                 type="number"
                 step="0.01"
@@ -77,7 +77,7 @@ export const PrinterRegisterPage: React.FC = () => {
 
             {formData.type !== 'bw' && (
               <GlassInput
-                label="Color Price per Page ($)"
+                label="Color Price per Page (৳)"
                 name="pricePerPageColor"
                 type="number"
                 step="0.01"

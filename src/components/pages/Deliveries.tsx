@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { MapPin, Clock, DollarSign, Package, CheckCircle, XCircle } from 'lucide-react';
+import { MapPin, Clock, Package, CheckCircle, XCircle } from 'lucide-react';
+import Taka from '../icons/Taka';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -186,7 +187,7 @@ export const Deliveries: React.FC = () => {
               
               <div className="flex flex-col items-end gap-3">
                 <div className="flex items-center text-lg font-bold text-campus-green">
-                  <DollarSign size={20} />
+                  <Taka size={20} />
                   <span>{delivery.payment.toFixed(2)}</span>
                 </div>
                 

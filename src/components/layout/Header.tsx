@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, X, User, CreditCard, LogOut, Settings, UserPlus, Edit } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
-import { GlassButton } from '../ui/GlassButton';
-import { GlassCard } from '../ui/GlassCard';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { ProfileEditor } from '../ui/ProfileEditor';
+import { GlassButton } from '../ui/GlassButton';
+import { BackButton } from '../ui/BackButton';
 import { cn } from '../../utils/cn';
 
 export const Header: React.FC = () => {
   const { user, isAuthenticated, logout, currentRole, switchRole } = useAuth();
-  const { isDark } = useTheme();
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showProfileEditor, setShowProfileEditor] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleRoleSwitch = (role: any) => {
     switchRole(role);
@@ -44,13 +43,18 @@ export const Header: React.FC = () => {
     <header className="fixed top-0 left-0 right-0 z-40 bg-glass-bg backdrop-blur-glass border-b border-glass-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-campus-green to-info rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">CP</span>
+                      {/* Back + Logo */}
+            <div className="flex items-center space-x-12">
+              {location.pathname !== '/' && (
+                <BackButton className="hidden md:inline-flex" />
+              )}
+              <Link to="/" className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-campus-green to-info rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">CP</span>
+                </div>
+                <span className="text-xl font-bold gradient-text">CampusPrint</span>
+              </Link>
             </div>
-            <span className="text-xl font-bold gradient-text">CampusPrint</span>
-          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
@@ -61,7 +65,7 @@ export const Header: React.FC = () => {
                 {/* Credit Balance */}
                 <div className="flex items-center space-x-2 px-3 py-1 bg-glass-bg rounded-component border border-glass-border">
                   <CreditCard size={16} className="text-campus-green" />
-                  <span className="text-sm font-medium">${user?.credits.toFixed(2)}</span>
+                  <span className="text-sm font-medium">৳{user?.credits.toFixed(2)}</span>
                 </div>
 
                 {/* Profile Menu */}
@@ -193,7 +197,7 @@ export const Header: React.FC = () => {
                   )}
                   <div>
                     <p className="font-medium">{user?.username}</p>
-                    <p className="text-sm text-theme-text-secondary">${user?.credits.toFixed(2)}</p>
+                    <p className="text-sm text-theme-text-secondary">৳{user?.credits.toFixed(2)}</p>
                   </div>
                 </div>
                 <Link

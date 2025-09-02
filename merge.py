@@ -1,4 +1,3 @@
-
 import argparse
 import os
 import sys
@@ -19,7 +18,6 @@ DEFAULT_IGNORED_GLOBS = [
     "*.DS_Store", "*.lock"
 ]
 
-# Obvious binary extensions to skip quickly
 BINARY_EXTS = {
     ".png",".jpg",".jpeg",".gif",".webp",".ico",".svg",
     ".mp4",".mp3",".wav",".mov",
@@ -28,12 +26,20 @@ BINARY_EXTS = {
     ".pdf",".dll"
 }
 
+def path_is_within(child: Path, parent: Path) -> bool:
+    try:
+        return child.is_relative_to(parent)  # py39+
+    except AttributeError:
+        child = child.resolve()
+        parent = parent.resolve()
+        return parent in child.parents or child == parent
+
 def should_ignore_dir(path: Path, ignored_dirs: set, ignored_globs: list) -> bool:
     # If any segment equals an ignored dir name
     for part in path.parts:
         if part in ignored_dirs:
             return True
-    # Or the path matches any ignore glob
+    # Or the full posix path matches any ignore glob
     rel = path.as_posix()
     return any(fnmatch(rel, pat) for pat in ignored_globs)
 
@@ -45,7 +51,7 @@ def should_ignore_file(path: Path, ignored_globs: list) -> bool:
         return True
     return False
 
-def concat_project(root: Path, out_file: Path, ignored_dirs, ignored_globs, max_mb: float, include_hidden: bool):
+def concat_project(root: Path, out_file: Path, ignored_dirs, ignored_globs, max_mb: float, include_hidden: bool, skip_symlinks: bool = True):
     root = root.resolve()
     out_file = out_file.resolve()
 
@@ -53,21 +59,23 @@ def concat_project(root: Path, out_file: Path, ignored_dirs, ignored_globs, max_
         print(f"Root folder does not exist or is not a directory: {root}", file=sys.stderr)
         sys.exit(1)
 
-    # Prevent writing into a location that will be included
-    if out_file.is_relative_to(root):
-        # Make sure we will not read the output file back in
+    # If writing inside root, make sure we never read our own output
+    if path_is_within(out_file, root):
         ignored_globs = list(ignored_globs) + [out_file.name]
 
-    bytes_limit = int(max_mb * 1024 * 1024)
+    byte_file_limit = int(max_mb * 1024 * 1024)
 
     files_written = 0
-    bytes_written = 0
 
     with out_file.open("w", encoding="utf-8", newline="\n") as out:
-        for current_dir, dirnames, filenames in os.walk(root):
+        for current_dir, dirnames, filenames in os.walk(root, followlinks=False):
             cur = Path(current_dir)
 
-            # Drop ignored directories in-place for os.walk
+            # Deterministic traversal
+            dirnames[:] = sorted(dirnames)
+            filenames = sorted(filenames)
+
+            # Prune ignored directories for os.walk
             pruned = []
             for d in list(dirnames):
                 dpath = cur / d
@@ -81,7 +89,11 @@ def concat_project(root: Path, out_file: Path, ignored_dirs, ignored_globs, max_
 
             for fname in filenames:
                 fpath = cur / fname
+                rel = None
 
+                # Quick filters
+                if skip_symlinks and fpath.is_symlink():
+                    continue
                 if not include_hidden and fname.startswith("."):
                     continue
                 if should_ignore_file(fpath, ignored_globs):
@@ -95,34 +107,36 @@ def concat_project(root: Path, out_file: Path, ignored_dirs, ignored_globs, max_
                     pass
 
                 try:
-                    # Size check
+                    # Size check per file
                     try:
                         size = fpath.stat().st_size
-                        if bytes_limit > 0 and size > bytes_limit:
+                        if byte_file_limit > 0 and size > byte_file_limit:
                             continue
                     except FileNotFoundError:
                         continue  # transient
 
                     rel = fpath.relative_to(root).as_posix()
-
-                    # Header line as the first line for this file
                     out.write(f"FILE: {rel}\n")
 
-                    # Write the file contents
+                    # Read and normalize line endings
                     with fpath.open("r", encoding="utf-8", errors="replace", newline="") as fin:
                         for line in fin:
-                            # Normalize to LF
                             if line.endswith("\r\n"):
                                 line = line[:-2] + "\n"
                             elif line.endswith("\r"):
                                 line = line[:-1] + "\n"
                             out.write(line)
 
-                    # Ensure a blank line between files
                     out.write("\n")
                     files_written += 1
+
                 except Exception as e:
-                    # Record error but keep going
+                    # Ensure we always print a header that identifies the file
+                    if rel is None:
+                        try:
+                            rel = fpath.relative_to(root).as_posix()
+                        except Exception:
+                            rel = fpath.as_posix()
                     out.write(f"FILE: {rel}\n")
                     out.write(f"[Skipped due to read error: {e}]\n\n")
                     continue
@@ -131,7 +145,7 @@ def concat_project(root: Path, out_file: Path, ignored_dirs, ignored_globs, max_
 
 def parse_args():
     p = argparse.ArgumentParser(
-        description="Concatenate a React project files into one txt with per file headers."
+        description="Concatenate project source files into one txt with per-file headers."
     )
     p.add_argument("root", help="Path to the project root")
     p.add_argument("output", help="Path to output txt file")
@@ -142,7 +156,9 @@ def parse_args():
     p.add_argument("--max-mb", type=float, default=2.0,
                    help="Skip files larger than this many megabytes. Use 0 to disable. Default 2")
     p.add_argument("--include-hidden", action="store_true",
-                   help="Include hidden files and folders that start with a dot")
+                   help="Include dotfiles and dot-directories")
+    p.add_argument("--no-skip-symlinks", action="store_true",
+                   help="Follow and include symlinked files")
     return p.parse_args()
 
 def main():
@@ -156,7 +172,15 @@ def main():
     ignored_globs = list(DEFAULT_IGNORED_GLOBS)
     ignored_globs.extend(args.ignore_globs or [])
 
-    concat_project(root, output, ignored_dirs, ignored_globs, args.max_mb, args.include_hidden)
+    concat_project(
+        root,
+        output,
+        ignored_dirs,
+        ignored_globs,
+        args.max_mb,
+        args.include_hidden,
+        skip_symlinks=not args.no_skip_symlinks,
+    )
 
 if __name__ == "__main__":
     main()

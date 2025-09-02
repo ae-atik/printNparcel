@@ -1,5 +1,6 @@
 import React from 'react';
-import { BarChart3, DollarSign, FileText, Printer } from 'lucide-react';
+import { BarChart3, FileText, Printer } from 'lucide-react';
+import Taka from '../icons/Taka';
 import { useUser } from '../../context/UserContext';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
@@ -13,21 +14,21 @@ export const Dashboard: React.FC = () => {
         return {
           title: 'Student Dashboard',
           stats: [
-            { label: 'Print Credits', value: `$${user.credits.toFixed(2)}`, icon: DollarSign, color: 'text-green-600' },
+            { label: 'Print Credits', value: `৳${user.credits.toFixed(2)}`, icon: () => <Taka size={20} />, color: 'text-green-600' },
             { label: 'Documents Printed', value: '24', icon: FileText, color: 'text-blue-600' },
             { label: 'Active Orders', value: '2', icon: Printer, color: 'text-orange-600' },
           ],
           recentActivity: [
             { id: 1, action: 'Printed lecture notes', time: '2 hours ago', status: 'completed' },
             { id: 2, action: 'Uploaded research paper', time: '1 day ago', status: 'pending' },
-            { id: 3, action: 'Added $20 credits', time: '3 days ago', status: 'completed' },
+            { id: 3, action: 'Added ৳20 credits', time: '3 days ago', status: 'completed' },
           ],
         };
       case 'printer-owner':
         return {
           title: 'Printer Owner Dashboard',
           stats: [
-            { label: 'Monthly Revenue', value: '$342.50', icon: DollarSign, color: 'text-green-600' },
+            { label: 'Monthly Revenue', value: '৳342.50', icon: () => <Taka size={20} />, color: 'text-green-600' },
             { label: 'Print Jobs', value: '89', icon: FileText, color: 'text-blue-600' },
             { label: 'Active Printers', value: '3', icon: Printer, color: 'text-orange-600' },
           ],
@@ -43,7 +44,7 @@ export const Dashboard: React.FC = () => {
           stats: [
             { label: 'Total Users', value: '1,234', icon: BarChart3, color: 'text-blue-600' },
             { label: 'Active Printers', value: '45', icon: Printer, color: 'text-green-600' },
-            { label: 'Monthly Revenue', value: '$12,450', icon: DollarSign, color: 'text-green-600' },
+            { label: 'Monthly Revenue', value: '৳12,450', icon: () => <Taka size={20} />, color: 'text-green-600' },
           ],
           recentActivity: [
             { id: 1, action: 'New printer registered', time: '1 hour ago', status: 'pending' },

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { MapPin, DollarSign, Printer, Upload, Filter, Search } from 'lucide-react';
+import { MapPin, Printer, Upload, Filter, Search } from 'lucide-react';
+import Taka from '../icons/Taka';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -160,7 +161,7 @@ export const Printers: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <div className="flex items-center text-sm text-gray-600">
-                    <DollarSign size={14} />
+                    <Taka size={14} />
                     <span className="font-medium">{printer.price}/page</span>
                   </div>
                 </div>
@@ -201,7 +202,7 @@ export const Printers: React.FC = () => {
             <h3 className="font-medium text-gray-900 mb-2">Printer Details</h3>
             <div className="space-y-1 text-sm text-gray-600">
               <p><strong>Location:</strong> {selectedPrinter?.location}</p>
-              <p><strong>Price:</strong> ${selectedPrinter?.price}/page</p>
+              <p><strong>Price:</strong> ৳{selectedPrinter?.price}/page</p>
               <p><strong>Type:</strong> {selectedPrinter?.type}</p>
             </div>
           </div>
@@ -220,8 +221,8 @@ export const Printers: React.FC = () => {
               id="file-upload"
             />
             <label htmlFor="file-upload">
-              <Button as="span" variant="secondary">
-                Browse Files
+              <Button variant="secondary">
+                <span>Browse Files</span>
               </Button>
             </label>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, MapPin, DollarSign, Star, Upload, Printer } from 'lucide-react';
+import { Search, Filter, MapPin, Coins, Star, Upload, Printer } from 'lucide-react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { GlassButton } from '../components/ui/GlassButton';
 import { GlassInput } from '../components/ui/GlassInput';
@@ -41,7 +41,7 @@ export const PrintersPage: React.FC = () => {
     }
     
     const totalCost = uploadedFiles.length * (colorPrint ? selectedPrinter?.pricePerPageColor || 0 : selectedPrinter?.pricePerPageBW || 0);
-    alert(`Print job submitted! Total cost: $${totalCost.toFixed(2)}`);
+    alert(`Print job submitted! Total cost: ৳${totalCost.toFixed(2)}`);
     setShowUploadModal(false);
     setSelectedPrinter(null);
     setUploadedFiles([]);
@@ -118,12 +118,12 @@ export const PrintersPage: React.FC = () => {
                   </div>
                   <div className="text-right">
                     <div className="flex items-center text-sm text-theme-text-secondary">
-                      <DollarSign size={14} />
+                      <Coins size={14} />
                       <span className="font-medium">{printer.pricePerPageBW}/page</span>
                     </div>
                     {printer.type === 'both' || printer.type === 'color' ? (
                       <div className="flex items-center text-sm text-theme-text-secondary">
-                        <span className="text-xs">Color: ${printer.pricePerPageColor}/page</span>
+                        <span className="text-xs">Color: ৳{printer.pricePerPageColor}/page</span>
                       </div>
                     ) : null}
                   </div>
@@ -184,9 +184,9 @@ export const PrintersPage: React.FC = () => {
               <h4 className="font-medium text-theme-text mb-2">Printer Details</h4>
               <div className="space-y-1 text-sm text-theme-text-secondary">
                 <p><strong>Location:</strong> {selectedPrinter?.location.hall} {selectedPrinter?.location.room}</p>
-                <p><strong>B&W Price:</strong> ${selectedPrinter?.pricePerPageBW}/page</p>
+                <p><strong>B&W Price:</strong> ৳{selectedPrinter?.pricePerPageBW}/page</p>
                 {selectedPrinter?.pricePerPageColor && selectedPrinter.pricePerPageColor > 0 && (
-                  <p><strong>Color Price:</strong> ${selectedPrinter.pricePerPageColor}/page</p>
+                  <p><strong>Color Price:</strong> ৳{selectedPrinter.pricePerPageColor}/page</p>
                 )}
                 <p><strong>Features:</strong> {selectedPrinter?.specifications.features.join(', ')}</p>
               </div>
@@ -208,7 +208,7 @@ export const PrintersPage: React.FC = () => {
                   className="w-4 h-4 text-campus-green bg-glass-bg border-glass-border rounded focus:ring-campus-green"
                 />
                 <label htmlFor="color-print" className="text-sm font-medium text-theme-text">
-                  Color Print (+${((selectedPrinter?.pricePerPageColor || 0) - (selectedPrinter?.pricePerPageBW || 0)).toFixed(2)}/page)
+                  Color Print (+৳{((selectedPrinter?.pricePerPageColor || 0) - (selectedPrinter?.pricePerPageBW || 0)).toFixed(2)}/page)
                 </label>
               </div>
             )}
@@ -219,7 +219,7 @@ export const PrintersPage: React.FC = () => {
                 <div className="space-y-1 text-sm text-theme-text-secondary">
                   <p><strong>Files:</strong> {uploadedFiles.length}</p>
                   <p><strong>Print Type:</strong> {colorPrint ? 'Color' : 'Black & White'}</p>
-                  <p><strong>Estimated Cost:</strong> ${(uploadedFiles.length * (colorPrint ? selectedPrinter?.pricePerPageColor || 0 : selectedPrinter?.pricePerPageBW || 0)).toFixed(2)}</p>
+                  <p><strong>Estimated Cost:</strong> ৳{(uploadedFiles.length * (colorPrint ? selectedPrinter?.pricePerPageColor || 0 : selectedPrinter?.pricePerPageBW || 0)).toFixed(2)}</p>
                 </div>
               </div>
             )}

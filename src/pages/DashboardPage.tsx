@@ -7,7 +7,7 @@ import { GlassButton } from '../components/ui/GlassButton';
 import { GlassInput } from '../components/ui/GlassInput';
 import { Modal } from '../components/ui/Modal';
 import { 
-  DollarSign, 
+  Coins, 
   FileText, 
   Printer, 
   Truck, 
@@ -102,13 +102,13 @@ export const DashboardPage: React.FC = () => {
     switch (currentRole) {
       case 'user':
         return [
-          { label: 'Print Credits', value: `$${user?.credits.toFixed(2)}`, icon: DollarSign, color: 'text-success' },
+          { label: 'Print Credits', value: `৳${user?.credits.toFixed(2)}`, icon: Coins, color: 'text-success' },
           { label: 'Documents Printed', value: '24', icon: FileText, color: 'text-info' },
           { label: 'Active Orders', value: '2', icon: Clock, color: 'text-warning' },
         ];
       case 'printer-owner':
         return [
-          { label: 'Monthly Revenue', value: '$342.50', icon: DollarSign, color: 'text-success' },
+          { label: 'Monthly Revenue', value: '৳342.50', icon: Coins, color: 'text-success' },
           { label: 'Print Jobs', value: '89', icon: FileText, color: 'text-info' },
           { label: 'Active Printers', value: '3', icon: Printer, color: 'text-campus-green' },
         ];
@@ -116,7 +116,7 @@ export const DashboardPage: React.FC = () => {
         return [
           { label: 'Total Users', value: '1,234', icon: Users, color: 'text-info' },
           { label: 'Active Printers', value: '45', icon: Printer, color: 'text-success' },
-          { label: 'Monthly Revenue', value: '$12,450', icon: DollarSign, color: 'text-success' },
+          { label: 'Monthly Revenue', value: '৳12,450', icon: Coins, color: 'text-success' },
         ];
       default:
         return [];
@@ -140,7 +140,7 @@ export const DashboardPage: React.FC = () => {
              currentRole === 'printer-owner' ? 'Printer Owner Dashboard' : 
              'Admin Dashboard'}
           </h1>
-          <p className="text-theme-text-secondary">Welcome back, {user?.firstName}!</p>
+          <p className="text-theme-text-secondary">Welcome back, {user?.firstName} {user?.lastName}!</p>
         </div>
 
         {/* Stats */}
@@ -226,7 +226,7 @@ export const DashboardPage: React.FC = () => {
                     className="p-4 h-auto flex-col"
                     onClick={() => navigate('/coming-soon')}
                   >
-                    <DollarSign size={24} className="mb-2" />
+                    <Coins size={24} className="mb-2" />
                     <span className="font-medium">Add Credits</span>
                     <span className="text-xs text-theme-text-secondary">Top up your account</span>
                   </GlassButton>
@@ -325,7 +325,7 @@ export const DashboardPage: React.FC = () => {
                       </select>
                     </div>
                     <GlassInput
-                      label="B&W Price per Page ($)"
+                      label="B&W Price per Page (৳)"
                       type="number"
                       step="0.01"
                       value={printerFormData.pricePerPageBW}
@@ -335,7 +335,7 @@ export const DashboardPage: React.FC = () => {
 
                   {printerFormData.type !== 'bw' && (
                     <GlassInput
-                      label="Color Price per Page ($)"
+                      label="Color Price per Page (৳)"
                       type="number"
                       step="0.01"
                       value={printerFormData.pricePerPageColor}
@@ -455,8 +455,8 @@ export const DashboardPage: React.FC = () => {
                             <span>{printer.location.hall} {printer.location.room}</span>
                           </div>
                           <div className="flex items-center">
-                            <DollarSign size={14} className="mr-2" />
-                            <span>B&W: ${printer.pricePerPageBW} | Color: ${printer.pricePerPageColor}</span>
+                            <Coins size={14} className="mr-2" />
+                            <span>B&W: ৳{printer.pricePerPageBW} | Color: ৳{printer.pricePerPageColor}</span>
                           </div>
                           <div className="flex items-center">
                             <Star size={14} className="mr-2" />
@@ -541,7 +541,7 @@ export const DashboardPage: React.FC = () => {
                       </select>
                     </div>
                     <GlassInput
-                      label="B&W Price per Page ($)"
+                      label="B&W Price per Page (৳)"
                       type="number"
                       step="0.01"
                       value={printerFormData.pricePerPageBW}
@@ -551,7 +551,7 @@ export const DashboardPage: React.FC = () => {
 
                   {printerFormData.type !== 'bw' && (
                     <GlassInput
-                      label="Color Price per Page ($)"
+                      label="Color Price per Page (৳)"
                       type="number"
                       step="0.01"
                       value={printerFormData.pricePerPageColor}

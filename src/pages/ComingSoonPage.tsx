@@ -8,8 +8,9 @@ export const ComingSoonPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen pt-16 px-4 sm:px-6 lg:px-8 py-8 flex items-center justify-center">
-      <div className="max-w-2xl mx-auto text-center space-y-8">
+    <div className="min-h-screen pt-16 px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-2xl mx-auto">
+        <div className="text-center space-y-8 flex items-center justify-center min-h-[calc(100vh-200px)] flex-col">
         {/* Animated Icon */}
         <div className="relative">
           <div className="w-32 h-32 mx-auto bg-gradient-to-r from-campus-green to-info rounded-full flex items-center justify-center animate-pulse">
@@ -109,6 +110,7 @@ export const ComingSoonPage: React.FC = () => {
             <Clock size={16} />
             <span className="text-sm">Expected launch: Q2 2024</span>
           </div>
+        </div>
         </div>
       </div>
     </div>

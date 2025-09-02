@@ -42,7 +42,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onMenuToggle }) => {
               <>
                 <div className="flex items-center space-x-2 text-sm">
                   <CreditCard size={16} className="text-gray-600" />
-                  <span className="font-medium">${user.credits.toFixed(2)}</span>
+                  <span className="font-medium">৳{user.credits.toFixed(2)}</span>
                 </div>
                 
                 <button className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full">

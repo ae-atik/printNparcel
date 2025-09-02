@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, MapPin, DollarSign, Package, Clock, User, CheckCircle, XCircle } from 'lucide-react';
+import { Plus, MapPin, Coins, Package, Clock, User, CheckCircle, XCircle } from 'lucide-react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { GlassButton } from '../components/ui/GlassButton';
 import { GlassInput } from '../components/ui/GlassInput';
@@ -179,7 +179,7 @@ export const DeliveryPage: React.FC = () => {
               
               <div className="flex items-center justify-between">
                 <div className="flex items-center text-lg font-bold text-campus-green">
-                  <DollarSign size={20} />
+                  <Coins size={20} />
                   <span>{delivery.payment.toFixed(2)}</span>
                 </div>
                 
@@ -335,7 +335,7 @@ export const DeliveryPage: React.FC = () => {
                   {/* Payment and Priority */}
                   <div className="grid grid-cols-2 gap-4">
                     <GlassInput
-                      label="Payment Amount ($)"
+                      label="Payment Amount (৳)"
                       type="number"
                       step="0.01"
                       value={formData.payment}

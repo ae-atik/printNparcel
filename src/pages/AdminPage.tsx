@@ -4,15 +4,22 @@ import { GlassCard } from '../components/ui/GlassCard';
 import { GlassButton } from '../components/ui/GlassButton';
 import { GlassInput } from '../components/ui/GlassInput';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
+import { listUsers, listPrinters } from '../lib/api';
 import { User, Printer as PrinterType } from '../types';
 import usersData from '../data/users.json';
 import printersData from '../data/printers.json';
+
 
 export const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'users' | 'printers' | 'analytics'>('users');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedPrinter, setSelectedPrinter] = useState<PrinterType | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [printers, setPrinters] = useState<PrinterType[]>([]);
   const { addToast } = useToast();
+  const { isDemo } = useAuth();
+
 
   // Set active tab based on URL hash or default to users
   useEffect(() => {
@@ -22,9 +29,30 @@ export const AdminPage: React.FC = () => {
     }
   }, []);
 
-  const mockUsers: User[] = usersData.users;
+// Load from demo JSON or backend depending on isDemo
+useEffect(() => {
+  let canceled = false;
 
-  const mockPrinters: PrinterType[] = printersData.printers;
+  async function load() {
+    if (isDemo) {
+      if (!canceled) {
+        setUsers(usersData.users as User[]);
+        setPrinters(printersData.printers as PrinterType[]);
+      }
+      return;
+    }
+
+    const [uRes, pRes] = await Promise.all([listUsers(), listPrinters()]);
+    if (canceled) return;
+
+    setUsers(Array.isArray(uRes.data) ? (uRes.data as User[]) : []);
+    setPrinters(Array.isArray(pRes.data) ? (pRes.data as PrinterType[]) : []);
+  }
+
+  load();
+  return () => { canceled = true; };
+}, [isDemo]);
+
 
   const handleApprovePrinter = (printerId: string) => {
     alert(`Printer ${printerId} approved successfully!`);
@@ -65,7 +93,7 @@ export const AdminPage: React.FC = () => {
   const renderUsersTab = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {mockUsers.map((user) => (
+        {users.map((user) => (
           <GlassCard key={user.id} className="p-6">
             <div className="flex items-start gap-4">
               <img
@@ -92,7 +120,7 @@ export const AdminPage: React.FC = () => {
                 <p className="text-sm text-theme-text-secondary mb-3">{user.university} - {user.hall}</p>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-campus-green">
-                    Credits: ${user.credits.toFixed(2)}
+                    Credits: ৳{Number(user?.credits ?? 0).toFixed(2)}
                   </span>
                   <GlassButton
                     variant="secondary"
@@ -114,7 +142,7 @@ export const AdminPage: React.FC = () => {
   const renderPrintersTab = () => (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {mockPrinters.map((printer) => (
+        {printers.map((printer) => (
           <GlassCard key={printer.id} className="p-6">
             <div className="flex items-start gap-4 mb-4">
               <div className="w-16 h-16 bg-gradient-to-br from-campus-green/20 to-info/20 rounded-lg flex items-center justify-center">
@@ -145,9 +173,9 @@ export const AdminPage: React.FC = () => {
             
             <div className="flex items-center justify-between">
               <div className="text-sm text-theme-text-secondary">
-                <span className="font-medium">B&W: ${printer.pricePerPageBW}</span>
+                <span className="font-medium">B&W: ৳{printer.pricePerPageBW}</span>
                 {printer.pricePerPageColor > 0 && (
-                  <span className="ml-3 font-medium">Color: ${printer.pricePerPageColor}</span>
+                  <span className="ml-3 font-medium">Color: ৳{printer.pricePerPageColor}</span>
                 )}
               </div>
               <div className="flex gap-2">
@@ -202,7 +230,7 @@ export const AdminPage: React.FC = () => {
         </GlassCard>
         <GlassCard className="p-6 text-center">
           <BarChart3 size={32} className="mx-auto text-campus-green mb-4" />
-          <h3 className="text-2xl font-bold text-theme-text">$12,450</h3>
+          <h3 className="text-2xl font-bold text-theme-text">৳12,450</h3>
           <p className="text-theme-text-secondary">Monthly Revenue</p>
         </GlassCard>
       </div>
@@ -303,7 +331,8 @@ export const AdminPage: React.FC = () => {
                     </div>
                     <div>
                       <p className="text-theme-text-secondary">Credits</p>
-                      <p className="text-theme-text font-medium">${selectedUser.credits.toFixed(2)}</p>
+                      <p className="text-theme-text font-medium">৳{Number(selectedUser?.credits ?? 0).toFixed(2)}</p>
+
                     </div>
                     <div>
                       <p className="text-theme-text-secondary">Roles</p>
@@ -376,13 +405,13 @@ export const AdminPage: React.FC = () => {
                     </div>
                     <div>
                       <p className="text-theme-text-secondary">B&W Price</p>
-                      <p className="text-theme-text font-medium">${selectedPrinter.pricePerPageBW}/page</p>
+                      <p className="text-theme-text font-medium">৳{selectedPrinter.pricePerPageBW}/page</p>
                     </div>
                     <div>
                       <p className="text-theme-text-secondary">Color Price</p>
                       <p className="text-theme-text font-medium">
                         {selectedPrinter.pricePerPageColor > 0 
-                          ? `$${selectedPrinter.pricePerPageColor}/page`
+                          ? `৳${selectedPrinter.pricePerPageColor}/page`
                           : 'N/A'
                         }
                       </p>
