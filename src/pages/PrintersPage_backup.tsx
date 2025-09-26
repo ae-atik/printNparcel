@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Printer as PrinterIcon, MapPin, Search, Upload, AlertCircle, CheckCircle, FileText } from 'lucide-react';
+import { Printer as PrinterIcon, MapPin, Search, Upload } from 'lucide-react';
 import { GlassCard } from '../components/ui/GlassCard';
 import { GlassButton } from '../components/ui/GlassButton';
 import { GlassInput } from '../components/ui/GlassInput';
@@ -7,14 +7,11 @@ import { Modal } from '../components/ui/Modal';
 import { FileUpload } from '../components/ui/FileUpload';
 import { listPrinters, createPrintJob } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
-import { estimatePageCount, isSupportedFileType } from '../utils/fileUtils';
 import type { Printer as PrinterType } from '../types';
 import printersData from '../data/printers.json';
 
 export const PrintersPage: React.FC = () => {
   const { isDemo } = useAuth();
-  const { addToast } = useToast();
   const [printers, setPrinters] = useState<PrinterType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +23,6 @@ export const PrintersPage: React.FC = () => {
   const [selectedPrinter, setSelectedPrinter] = useState<PrinterType | null>(null);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [colorPrint, setColorPrint] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     let canceled = false;
@@ -49,7 +45,7 @@ export const PrintersPage: React.FC = () => {
         if (res.ok && Array.isArray(res.data)) {
           setPrinters(res.data as PrinterType[]);
         } else {
-          throw new Error(!res.ok ? res.error.message : 'Failed to load printers');
+          throw new Error(res.error?.message || 'Failed to load printers');
         }
       } catch (err: any) {
         if (!canceled) {
@@ -94,77 +90,34 @@ export const PrintersPage: React.FC = () => {
   // Submit print job to backend
   const handleSubmitPrintJob = async () => {
     if (!selectedPrinter || uploadedFiles.length === 0) {
-      addToast({
-        type: 'warning',
-        title: 'Missing Information',
-        message: 'Please select a printer and upload files.'
-      });
+      alert('Please select a printer and upload files.');
       return;
     }
-
-    // Check for unsupported files
-    const unsupportedFiles = uploadedFiles.filter(file => !isSupportedFileType(file));
-    if (unsupportedFiles.length > 0) {
-      addToast({
-        type: 'error',
-        title: 'Unsupported File Types',
-        message: `${unsupportedFiles.length} file(s) are not supported. Please upload PDF, Word documents, text files, or images.`
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
 
     try {
-      // For now, handle only the first file. In a real app, you might want to handle multiple files
-      const file = uploadedFiles[0];
-      const estimatedPages = estimatePageCount(file);
-      
       const orderData = {
-        file: file,
         printerId: selectedPrinter.id,
-        pages: estimatedPages,
-        isColor: colorPrint,
+        files: uploadedFiles.map(file => file.name), // In real app, files would be uploaded first
+        colorPrint: colorPrint,
         copies: 1, // Could be made configurable
+        paperSize: 'A4', // Could be made configurable
+        deliveryLocation: 'Pick up at printer', // Could be made configurable
       };
 
       const token = localStorage.getItem("auth_token");
       const res = await createPrintJob(orderData, token || undefined);
       
       if (!res.ok) {
-        addToast({
-          type: 'error',
-          title: 'Print Request Failed',
-          message: res.error.message || 'Unknown error occurred'
-        });
+        alert(`Print job failed: ${res.error?.message || 'Unknown error'}`);
         return;
       }
 
-      // Success feedback
-      addToast({
-        type: 'success',
-        title: 'Print Request Submitted',
-        message: `Successfully submitted ${file.name} (${estimatedPages} pages) to ${selectedPrinter.name}`
-      });
-
-      // Dispatch event to refresh activities
-      window.dispatchEvent(new CustomEvent('print-request:created'));
-
-      // Reset form
       setShowUploadModal(false);
       setUploadedFiles([]);
       setSelectedPrinter(null);
-      setColorPrint(false);
-
+      alert('Print job submitted successfully!');
     } catch (error) {
-      console.error('Print job submission error:', error);
-      addToast({
-        type: 'error',
-        title: 'Submission Error',
-        message: 'Failed to submit print request. Please try again.'
-      });
-    } finally {
-      setIsSubmitting(false);
+      alert('Print job submission failed. Please try again.');
     }
   };
 
@@ -248,12 +201,12 @@ export const PrintersPage: React.FC = () => {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm">B&W:</span>
-                  <span className="text-sm font-medium">৳{printer.pricePerPageBW.toFixed(2)}/page</span>
+                  <span className="text-sm font-medium">৳{printer.pricePerPageBW}/page</span>
                 </div>
                 {printer.type !== 'bw' && (
                   <div className="flex justify-between">
                     <span className="text-sm">Color:</span>
-                    <span className="text-sm font-medium">৳{printer.pricePerPageColor.toFixed(2)}/page</span>
+                    <span className="text-sm font-medium">৳{printer.pricePerPageColor}/page</span>
                   </div>
                 )}
               </div>
@@ -302,9 +255,9 @@ export const PrintersPage: React.FC = () => {
               <div className="mt-2">
                 <p><strong>Pricing:</strong></p>
                 <ul className="ml-4">
-                  <li>B&W: ৳{selectedPrinter?.pricePerPageBW.toFixed(2)}/page</li>
+                  <li>B&W: ৳{selectedPrinter?.pricePerPageBW}/page</li>
                   {selectedPrinter?.type !== 'bw' && (
-                    <li>Color: ৳{selectedPrinter?.pricePerPageColor.toFixed(2)}/page</li>
+                    <li>Color: ৳{selectedPrinter?.pricePerPageColor}/page</li>
                   )}
                 </ul>
               </div>
@@ -313,83 +266,17 @@ export const PrintersPage: React.FC = () => {
 
           <div>
             <h4 className="font-medium mb-2">Upload Files</h4>
-            <FileUpload onFilesChange={handleFileUpload} />
+            <FileUpload onFilesSelected={handleFileUpload} />
             {uploadedFiles.length > 0 && (
-              <div className="mt-4">
-                <div className="mb-3 flex items-center justify-between">
-                  <p className="text-sm text-theme-text-secondary font-medium">
-                    {uploadedFiles.length} file(s) selected
-                  </p>
-                  {uploadedFiles.some(file => !isSupportedFileType(file)) && (
-                    <div className="flex items-center space-x-1 text-xs text-red-400">
-                      <AlertCircle size={12} />
-                      <span>Unsupported files detected</span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  {uploadedFiles.map((file, index) => {
-                    const estimatedPages = estimatePageCount(file);
-                    const isSupported = isSupportedFileType(file);
-                    const fileSize = (file.size / 1024 / 1024).toFixed(2);
-                    
-                    return (
-                      <div 
-                        key={index} 
-                        className={`flex items-center justify-between p-3 rounded-component border transition-colors ${
-                          isSupported 
-                            ? 'border-glass-border bg-glass-bg/30 hover:bg-glass-bg/50' 
-                            : 'border-red-500/30 bg-red-500/5'
-                        }`}
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div className={`p-2 rounded-lg ${isSupported ? 'bg-campus-green/20' : 'bg-red-500/20'}`}>
-                            {isSupported ? (
-                              <CheckCircle size={16} className="text-campus-green" />
-                            ) : (
-                              <AlertCircle size={16} className="text-red-400" />
-                            )}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className={`text-sm font-medium truncate ${!isSupported ? 'text-red-400' : 'text-theme-text'}`}>
-                              {file.name}
-                            </p>
-                            <p className="text-xs text-theme-text-secondary">
-                              {fileSize} MB • {file.type || 'Unknown type'}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        <div className="text-right flex-shrink-0">
-                          <div className={`text-sm font-medium ${!isSupported ? 'text-red-400' : 'text-theme-text'}`}>
-                            ~{estimatedPages} pages
-                          </div>
-                          <div className="text-xs text-theme-text-secondary">
-                            {isSupported ? 'Ready' : 'Unsupported'}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Summary Section */}
-                {uploadedFiles.filter(file => isSupportedFileType(file)).length > 0 && (
-                  <div className="mt-4 p-3 bg-campus-green/5 border border-campus-green/20 rounded-component">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <FileText size={16} className="text-campus-green" />
-                      <span className="text-sm font-medium text-theme-text">Print Summary</span>
-                    </div>
-                    <div className="text-sm text-theme-text-secondary">
-                      <p>Supported files: {uploadedFiles.filter(file => isSupportedFileType(file)).length}</p>
-                      <p>Total estimated pages: {uploadedFiles
-                        .filter(file => isSupportedFileType(file))
-                        .reduce((sum, file) => sum + estimatePageCount(file), 0)}</p>
-                      <p>Print mode: {colorPrint ? 'Color' : 'Black & White'}</p>
-                    </div>
-                  </div>
-                )}
+              <div className="mt-2">
+                <p className="text-sm text-theme-text-secondary">
+                  {uploadedFiles.length} file(s) selected
+                </p>
+                <ul className="text-xs text-theme-text-muted">
+                  {uploadedFiles.map((file, index) => (
+                    <li key={index}>• {file.name}</li>
+                  ))}
+                </ul>
               </div>
             )}
           </div>
@@ -422,17 +309,10 @@ export const PrintersPage: React.FC = () => {
             </GlassButton>
             <GlassButton
               onClick={handleSubmitPrintJob}
-              disabled={uploadedFiles.length === 0 || isSubmitting || !uploadedFiles.some(file => isSupportedFileType(file))}
+              disabled={uploadedFiles.length === 0}
               className="flex-1"
             >
-              {isSubmitting ? (
-                <div className="flex items-center space-x-2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>Submitting...</span>
-                </div>
-              ) : (
-                'Submit Print Job'
-              )}
+              Submit Print Job
             </GlassButton>
           </div>
         </div>

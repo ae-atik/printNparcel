@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, MapPin, Eye, EyeOff, Building } from 'lucide-react';
+import { Mail, Lock, User, MapPin, Eye, EyeOff, Building, Phone } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { GlassCard } from '../components/ui/GlassCard';
 import { GlassButton } from '../components/ui/GlassButton';
@@ -14,6 +14,7 @@ export const SignupPage: React.FC = () => {
     username: '',
     firstName: '',
     lastName: '',
+    phoneNumber: '',
     university: '',
     hall: '',
   });
@@ -104,6 +105,16 @@ export const SignupPage: React.FC = () => {
               onChange={handleChange}
               icon={<Mail size={20} />}
               required
+            />
+
+            <GlassInput
+              label="Phone Number (Optional)"
+              type="tel"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              icon={<Phone size={20} />}
+              placeholder="+1 (555) 000-0000"
             />
 
             <GlassInput

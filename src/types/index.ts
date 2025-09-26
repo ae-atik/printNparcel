@@ -4,6 +4,7 @@ export interface User {
   username: string;
   firstName: string;
   lastName: string;
+  phoneNumber?: string;
   profilePicture?: string;
   credits: number;
   roles: UserRole[];
@@ -12,7 +13,7 @@ export interface User {
   createdAt: string;
 }
 
-export type UserRole = 'user' | 'printer-owner' | 'admin';
+export type UserRole = 'user' | 'printer_owner' | 'admin';
 
 export interface Printer {
   id: string;
@@ -33,11 +34,32 @@ export interface Printer {
     paperSizes: string[];
     features: string[];
   };
-  status: 'online' | 'offline' | 'busy' | 'maintenance';
+  status: 'online' | 'offline' | 'busy' | 'maintenance' | 'pending' | 'declined';
   isApproved: boolean;
   rating: number;
   totalJobs: number;
   createdAt: string;
+}
+
+export interface PrinterFormData {
+  name: string;
+  type: 'color' | 'bw' | 'both';
+  pricePerPageBW: number;
+  pricePerPageColor: number;
+  location: {
+    university: string;
+    hall: string;
+    room?: string;
+  };
+  specifications: {
+    brand: string;
+    model: string;
+    paperSizes: string[];
+    features: string[];
+  };
+  colorSupport: boolean;
+  duplexSupport: boolean;
+  paperSize: string;
 }
 
 export interface PrintJob {

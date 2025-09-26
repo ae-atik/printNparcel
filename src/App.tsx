@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -11,10 +10,12 @@ import { LoginPage } from './pages/LoginPage';
 import { SignupPage } from './pages/SignupPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { PrintersPage } from './pages/PrintersPage';
-import { DeliveryPage } from './pages/DeliveryPage';
+import { OrdersPage } from './pages/OrdersPage';
+import DeliveryPage from './pages/DeliveryPage';
 import { AdminPage } from './pages/AdminPage';
 import { ComingSoonPage } from './pages/ComingSoonPage';
 import { PrinterRegisterPage } from './pages/PrinterRegisterPage';
+import { PrinterOwnerDashboard } from './pages/PrinterOwnerDashboard';
 
 function App() {
   return (
@@ -58,6 +59,14 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
+                <Route
+  path="/orders"
+  element={
+    <ProtectedRoute>
+      <OrdersPage />
+    </ProtectedRoute>
+  }
+/>
 
                 {/* Add Printer registration page */}
                 <Route
@@ -65,6 +74,16 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <PrinterRegisterPage />
+                    </ProtectedRoute>
+                  }
+                />
+                
+                {/* Printer Owner Dashboard */}
+                <Route
+                  path="/printer-dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <PrinterOwnerDashboard />
                     </ProtectedRoute>
                   }
                 />

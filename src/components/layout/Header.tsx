@@ -1,12 +1,21 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, User, CreditCard, LogOut, Settings, UserPlus, Edit } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { ThemeToggle } from '../ui/ThemeToggle';
-import { ProfileEditor } from '../ui/ProfileEditor';
-import { GlassButton } from '../ui/GlassButton';
-import { BackButton } from '../ui/BackButton';
-import { cn } from '../../utils/cn';
+import React, { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import {
+  Menu,
+  X,
+  User,
+  CreditCard,
+  LogOut,
+  Settings,
+  UserPlus,
+  Edit,
+} from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { ThemeToggle } from "../ui/ThemeToggle";
+import { ProfileEditor } from "../ui/ProfileEditor";
+import { GlassButton } from "../ui/GlassButton";
+import { BackButton } from "../ui/BackButton";
+import { cn } from "../../utils/cn";
 
 export const Header: React.FC = () => {
   const { user, isAuthenticated, logout, currentRole, switchRole } = useAuth();
@@ -19,53 +28,57 @@ export const Header: React.FC = () => {
   const handleRoleSwitch = (role: any) => {
     switchRole(role);
     setIsProfileMenuOpen(false);
-    
+
     // Navigate to appropriate dashboard
     switch (role) {
-      case 'admin':
-        navigate('/admin');
+      case "admin":
+        navigate("/admin");
         break;
-      case 'printer-owner':
-        navigate('/dashboard');
+      case "printer_owner":
+        navigate("/dashboard");
         break;
       default:
-        navigate('/dashboard');
+        navigate("/dashboard");
     }
   };
 
   const handleLogout = () => {
     logout();
     setIsProfileMenuOpen(false);
-    navigate('/');
+    navigate("/");
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 bg-glass-bg backdrop-blur-glass border-b border-glass-border">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-glass-bg backdrop-blur-glass border-b border-glass-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-                      {/* Back + Logo */}
-            <div className="flex items-center space-x-12">
-              {location.pathname !== '/' && (
-                <BackButton className="hidden md:inline-flex" />
-              )}
-              <Link to="/" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-campus-green to-info rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">CP</span>
-                </div>
-                <span className="text-xl font-bold gradient-text">CampusPrint</span>
-              </Link>
-            </div>
+          {/* Back + Logo */}
+          <div className="flex items-center space-x-12">
+            {location.pathname !== "/" && (
+              <BackButton className="hidden md:inline-flex" />
+            )}
+            <Link to="/" className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-campus-green to-info rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">CP</span>
+              </div>
+              <span className="text-xl font-bold gradient-text">
+                CampusPrint
+              </span>
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
             <ThemeToggle />
-            
+
             {isAuthenticated ? (
               <>
                 {/* Credit Balance */}
                 <div className="flex items-center space-x-2 px-3 py-1 bg-glass-bg rounded-component border border-glass-border">
                   <CreditCard size={16} className="text-campus-green" />
-                  <span className="text-sm font-medium">৳{user?.credits.toFixed(2)}</span>
+                  <span className="text-sm font-medium">
+                    ৳{user?.credits.toFixed(2)}
+                  </span>
                 </div>
 
                 {/* Profile Menu */}
@@ -76,8 +89,8 @@ export const Header: React.FC = () => {
                   >
                     {user?.profilePicture ? (
                       <img
-                        src={user.profilePicture}
-                        alt={user.username}
+                        src={user?.profilePicture as string}
+                        alt={user?.username || "profile"}
                         className="w-8 h-8 rounded-full object-cover"
                       />
                     ) : (
@@ -85,35 +98,46 @@ export const Header: React.FC = () => {
                         <User size={16} className="text-white" />
                       </div>
                     )}
-                    <span className="text-sm font-medium">{user?.username}</span>
+                    <span className="text-sm font-medium">
+                      {user?.username}
+                    </span>
                   </button>
 
                   {isProfileMenuOpen && (
                     <div className="absolute right-0 mt-2 w-64 py-2 z-50 bg-glass-bg backdrop-blur-xl border border-glass-border rounded-glass shadow-glass-hover">
                       <div className="px-4 py-3 border-b border-glass-border">
-                        <p className="text-sm font-medium">{user?.firstName} {user?.lastName}</p>
-                        <p className="text-xs text-theme-text-secondary">{user?.email}</p>
-                        <p className="text-xs text-campus-green mt-1">Current: {currentRole}</p>
+                        <p className="text-sm font-medium">
+                          {user?.firstName} {user?.lastName}
+                        </p>
+                        <p className="text-xs text-theme-text-secondary">
+                          {user?.email}
+                        </p>
+                        <p className="text-xs text-campus-green mt-1">
+                          Current: {currentRole}
+                        </p>
                       </div>
-                      
+
                       {user?.roles && user.roles.length > 1 && (
                         <div className="px-4 py-2 border-b border-glass-border">
-                          <p className="text-xs text-theme-text-secondary mb-2">Switch Role:</p>
+                          <p className="text-xs text-theme-text-secondary mb-2">
+                            Switch Role:
+                          </p>
                           {user.roles.map((role) => (
                             <button
                               key={role}
                               onClick={() => handleRoleSwitch(role)}
                               className={cn(
-                                'block w-full text-left px-2 py-1 text-sm rounded hover:bg-glass-hover transition-colors',
-                                currentRole === role && 'text-campus-green'
+                                "block w-full text-left px-2 py-1 text-sm rounded hover:bg-glass-hover transition-colors",
+                                currentRole === role && "text-campus-green"
                               )}
                             >
-                              {role.charAt(0).toUpperCase() + role.slice(1).replace('-', ' ')}
+                              {role.charAt(0).toUpperCase() +
+                                role.slice(1).replace("-", " ")}
                             </button>
                           ))}
                         </div>
                       )}
-                      
+
                       <div className="py-1">
                         <button
                           onClick={() => {
@@ -147,15 +171,12 @@ export const Header: React.FC = () => {
               </>
             ) : (
               <div className="flex items-center space-x-3">
-                <GlassButton
-                  variant="ghost"
-                  onClick={() => navigate('/login')}
-                >
+                <GlassButton variant="ghost" onClick={() => navigate("/login")}>
                   Login
                 </GlassButton>
                 <GlassButton
                   variant="primary"
-                  onClick={() => navigate('/signup')}
+                  onClick={() => navigate("/signup")}
                 >
                   <UserPlus size={16} className="mr-2" />
                   Sign Up
@@ -180,14 +201,14 @@ export const Header: React.FC = () => {
               <span className="text-sm font-medium text-theme-text">Theme</span>
               <ThemeToggle />
             </div>
-            
+
             {isAuthenticated ? (
               <div className="space-y-3">
                 <div className="flex items-center space-x-3 px-2 py-2">
                   {user?.profilePicture ? (
                     <img
-                      src={user.profilePicture}
-                      alt={user.username}
+                      src={user?.profilePicture as string}
+                      alt={user?.username || "profile"}
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   ) : (
@@ -197,7 +218,9 @@ export const Header: React.FC = () => {
                   )}
                   <div>
                     <p className="font-medium">{user?.username}</p>
-                    <p className="text-sm text-theme-text-secondary">৳{user?.credits.toFixed(2)}</p>
+                    <p className="text-sm text-theme-text-secondary">
+                      ৳{user?.credits.toFixed(2)}
+                    </p>
                   </div>
                 </div>
                 <Link
@@ -229,7 +252,7 @@ export const Header: React.FC = () => {
                   variant="ghost"
                   className="w-full justify-center"
                   onClick={() => {
-                    navigate('/login');
+                    navigate("/login");
                     setIsMobileMenuOpen(false);
                   }}
                 >
@@ -239,7 +262,7 @@ export const Header: React.FC = () => {
                   variant="primary"
                   className="w-full justify-center"
                   onClick={() => {
-                    navigate('/signup');
+                    navigate("/signup");
                     setIsMobileMenuOpen(false);
                   }}
                 >

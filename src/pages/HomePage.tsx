@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Printer, Truck, Plus, Star, Users, Clock, Shield } from 'lucide-react';
+import { Printer, Truck, Plus, Users, Clock, Shield } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { GlassCard } from '../components/ui/GlassCard';
 import { GlassButton } from '../components/ui/GlassButton';
-import reviewsData from '../data/reviews.json';
 
 export const HomePage: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -127,45 +126,10 @@ export const HomePage: React.FC = () => {
         </div>
       </section>
 
-      {/* User Reviews Section */}
+      {/* Join Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">What Students Say</h2>
-            <p className="text-xl text-theme-text-secondary">
-              Join thousands of satisfied students who trust CampusPrint for their printing and delivery needs.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {reviewsData.reviews.map((review) => (
-              <GlassCard key={review.id} className="p-6">
-                <div className="flex items-center mb-4">
-                  <img
-                    src={review.avatar}
-                    alt={review.name}
-                    className="w-12 h-12 rounded-full object-cover mr-4"
-                  />
-                  <div>
-                    <h4 className="font-semibold">{review.name}</h4>
-                    <div className="flex items-center">
-                      {[...Array(review.rating)].map((_, i) => (
-                        <Star key={i} size={16} className="text-yellow-400 fill-current" />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                <p className="text-theme-text-secondary italic">"{review.comment}"</p>
-                <div className="mt-4">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-campus-green-light text-campus-green">
-                    {review.serviceType}
-                  </span>
-                </div>
-              </GlassCard>
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
+          <div className="text-center">
             <GlassButton
               variant="primary"
               size="lg"

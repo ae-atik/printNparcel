@@ -44,7 +44,7 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleGuest = async (role: 'user' | 'printer-owner' | 'admin' = 'user') => {
+  const handleGuest = async (role: 'user' | 'printer_owner' | 'admin' = 'user') => {
     setError('');
     try {
       await loginDemo(role);
@@ -149,7 +149,7 @@ export const LoginPage: React.FC = () => {
                 type="button"
                 variant="ghost"
                 className="w-full border border-zinc-300 dark:border-glass-border hover:bg-glass-bg focus-visible:ring-2 focus-visible:ring-campus-green"
-                onClick={() => handleGuest('printer-owner')}
+                onClick={() => handleGuest('printer_owner')}
                 aria-label="Continue as Printer Owner (Demo)"
                 disabled={isLoading}
               >

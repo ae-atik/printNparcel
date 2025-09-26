@@ -1,37 +1,87 @@
+// frontend/src/pages/PrinterRegisterPage.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { createPrinter } from '../lib/api';
+import { useToast } from '../context/ToastContext';
 import { GlassCard } from '../components/ui/GlassCard';
 import { GlassInput } from '../components/ui/GlassInput';
 import { GlassButton } from '../components/ui/GlassButton';
 
 export const PrinterRegisterPage: React.FC = () => {
-  const { addRole } = useAuth();
+  const { user } = useAuth();
+  const { addToast } = useToast();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    name: '',
-    type: 'both',
-    pricePerPageBW: '',
-    pricePerPageColor: '',
-    brand: '',
-    model: '',
-    paperSizes: 'A4,Letter',
-    features: '',
-    hall: '',
-    room: '',
+    printerLocation: '',
+    rateMono: '1',
+    rateColor: '1',
+    paperSize: 'A4',
+    colorSupport: false,
+    duplexSupport: false,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type } = e.target;
+    if (type === 'checkbox') {
+      const checked = (e.target as HTMLInputElement).checked;
+      setFormData(prev => ({ ...prev, [name]: checked }));
+    } else if (name === 'rateMono' || name === 'rateColor') {
+      // Ensure rates don't go below 0
+      const numValue = Math.max(0, Number(value) || 0);
+      setFormData(prev => ({ ...prev, [name]: numValue.toString() }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In real app, send payload to API
-    addRole('printer-owner');
-    alert('Printer application submitted! Admin will review and approve your printer.');
+    if (!user?.id) {
+      addToast({ type: 'error', title: 'Not logged in', message: 'Please log in first.' });
+      return;
+    }
+
+    // Validate required fields
+    if (!formData.printerLocation.trim()) {
+      addToast({ type: 'error', title: 'Missing Information', message: 'Printer location is required.' });
+      return;
+    }
+
+    const monoRate = Number(formData.rateMono);
+    const colorRate = Number(formData.rateColor);
+
+    if (monoRate < 0 || colorRate < 0) {
+      addToast({ type: 'error', title: 'Invalid Rates', message: 'Rates cannot be negative.' });
+      return;
+    }
+
+    // Map form data to match backend API format
+    const payload = {
+      name: formData.printerLocation.trim(),  // Backend expects 'name' field for printer location
+      pricePerPageBW: monoRate,              // Backend expects 'pricePerPageBW' for mono rate
+      pricePerPageColor: colorRate,          // Backend expects 'pricePerPageColor' for color rate
+      paperSize: formData.paperSize,
+      colorSupport: formData.colorSupport,
+      duplexSupport: formData.duplexSupport
+    };
+
+    const res = await createPrinter(payload, localStorage.getItem("auth_token") || undefined);
+    if (!res.ok) {
+      addToast({
+        type: 'error',
+        title: 'Registration failed',
+        message: res.error?.message || 'Please try again.'
+      });
+      return;
+    }
+
+    addToast({ 
+      type: 'success', 
+      title: 'Printer Registered', 
+      message: 'Your printer is pending admin approval.' 
+    });
     navigate('/dashboard');
   };
 
@@ -43,99 +93,89 @@ export const PrinterRegisterPage: React.FC = () => {
         <GlassCard className="p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <GlassInput
-              label="Printer Name"
-              name="name"
-              value={formData.name}
+              label="Printer Location"
+              name="printerLocation"
+              value={formData.printerLocation}
               onChange={handleChange}
+              placeholder="e.g., Ground Floor Hall A, Room 101"
               required
             />
-
+            
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-theme-text mb-2">Printer Type</label>
-                <select
-                  name="type"
-                  value={formData.type}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 bg-glass-bg backdrop-blur-glass border border-glass-border rounded-component text-theme-text focus:outline-none focus:border-campus-green"
-                >
-                  <option value="color">Color Only</option>
-                  <option value="bw">Black & White Only</option>
-                  <option value="both">Both Color & B&W</option>
-                </select>
+              <GlassInput
+                label="Mono Rate (৳ per page)"
+                name="rateMono"
+                type="number"
+                min="0"
+                step="1"
+                value={formData.rateMono}
+                onChange={handleChange}
+                placeholder="e.g., 2"
+                required
+              />
+              <GlassInput
+                label="Color Rate (৳ per page)"
+                name="rateColor"
+                type="number"
+                min="0"
+                step="1"
+                value={formData.rateColor}
+                onChange={handleChange}
+                placeholder="e.g., 5"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-theme-text mb-2">Paper Size</label>
+              <select
+                name="paperSize"
+                value={formData.paperSize}
+                onChange={handleChange}
+                className="w-full px-4 py-3 bg-glass-bg backdrop-blur-glass border border-glass-border rounded-component text-theme-text focus:outline-none focus:border-campus-green"
+              >
+                <option value="A4">A4</option>
+                <option value="A3">A3</option>
+                <option value="Letter">Letter</option>
+                <option value="Legal">Legal</option>
+              </select>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-theme-text">Printer Features</h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    id="colorSupport"
+                    name="colorSupport"
+                    checked={formData.colorSupport}
+                    onChange={handleChange}
+                    className="w-4 h-4 text-campus-green bg-glass-bg border-glass-border rounded focus:ring-campus-green focus:ring-2"
+                  />
+                  <label htmlFor="colorSupport" className="text-sm font-medium text-theme-text">
+                    Color Support
+                  </label>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    id="duplexSupport"
+                    name="duplexSupport"
+                    checked={formData.duplexSupport}
+                    onChange={handleChange}
+                    className="w-4 h-4 text-campus-green bg-glass-bg border-glass-border rounded focus:ring-campus-green focus:ring-2"
+                  />
+                  <label htmlFor="duplexSupport" className="text-sm font-medium text-theme-text">
+                    Duplex Support (Double-sided)
+                  </label>
+                </div>
               </div>
-              <GlassInput
-                label="B&W Price per Page (৳)"
-                name="pricePerPageBW"
-                type="number"
-                step="0.01"
-                value={formData.pricePerPageBW}
-                onChange={handleChange}
-                required
-              />
             </div>
-
-            {formData.type !== 'bw' && (
-              <GlassInput
-                label="Color Price per Page (৳)"
-                name="pricePerPageColor"
-                type="number"
-                step="0.01"
-                value={formData.pricePerPageColor}
-                onChange={handleChange}
-                required={formData.type !== 'bw'}
-              />
-            )}
-
-            <div className="grid grid-cols-2 gap-4">
-              <GlassInput
-                label="Brand"
-                name="brand"
-                value={formData.brand}
-                onChange={handleChange}
-                required
-              />
-              <GlassInput
-                label="Model"
-                name="model"
-                value={formData.model}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <GlassInput
-                label="Hall"
-                name="hall"
-                value={formData.hall}
-                onChange={handleChange}
-                required
-              />
-              <GlassInput
-                label="Room (Optional)"
-                name="room"
-                value={formData.room}
-                onChange={handleChange}
-              />
-            </div>
-
-            <GlassInput
-              label="Paper Sizes (comma separated)"
-              name="paperSizes"
-              value={formData.paperSizes}
-              onChange={handleChange}
-            />
-
-            <GlassInput
-              label="Features (comma separated)"
-              name="features"
-              value={formData.features}
-              onChange={handleChange}
-            />
 
             <GlassButton variant="primary" type="submit" className="w-full" glow>
-              Submit Application
+              Register Printer
             </GlassButton>
           </form>
         </GlassCard>

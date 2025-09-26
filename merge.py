@@ -15,7 +15,7 @@ DEFAULT_IGNORED_GLOBS = [
     "*.zip", "*.gz", "*.br", "*.tar", "*.rar", "*.7z",
     "*.woff", "*.woff2", "*.ttf", "*.eot", "*.otf",
     "*.pdf", "*.dll",
-    "*.DS_Store", "*.lock"
+    "*.DS_Store", "*.lock",  "merge.py", "package-lock.json"
 ]
 
 BINARY_EXTS = {

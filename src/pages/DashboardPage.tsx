@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, {useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { GlassCard } from '../components/ui/GlassCard';
 import { GlassButton } from '../components/ui/GlassButton';
-import { GlassInput } from '../components/ui/GlassInput';
-import { Modal } from '../components/ui/Modal';
+import { ActivityItem } from '../components/ui/ActivityItem';
 import { 
   Coins, 
   FileText, 
@@ -15,87 +14,130 @@ import {
   Settings,
   BarChart3,
   Users,
-  CheckCircle,
   Clock,
   MapPin,
   Star,
   Edit,
-  Trash2,
+  MessageCircle,
 } from 'lucide-react';
+import { listOwnerPrinters, getMyActivities, getPrinterOwnerActivities } from '../lib/api';
+import { Printer as PrinterType } from '../types';
 import activitiesData from '../data/activities.json';
 import printersData from '../data/printers.json';
 
+
 export const DashboardPage: React.FC = () => {
-  const { user, currentRole, addRole } = useAuth();
+  const { user, currentRole, isDemo } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
-  const [showPrinterApplication, setShowPrinterApplication] = useState(false);
   const [showMyPrinters, setShowMyPrinters] = useState(false);
-  const [showEditPrinter, setShowEditPrinter] = useState(false);
-  const [selectedPrinter, setSelectedPrinter] = useState<any>(null);
-  const [printerFormData, setPrinterFormData] = useState({
-    name: '',
-    type: 'both',
-    pricePerPageBW: '',
-    pricePerPageColor: '',
-    brand: '',
-    model: '',
-    paperSizes: 'A4,Letter',
-    features: '',
-    hall: '',
-    room: '',
-  });
+  const [activities, setActivities] = useState<any[]>([]);
+  const [loadingActivities, setLoadingActivities] = useState(false);
+  const [displayedActivities, setDisplayedActivities] = useState<any[]>([]);
+  const [showAllActivities, setShowAllActivities] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const ACTIVITIES_PER_PAGE = 5;
 
-  const myPrinters = printersData.printers.filter(printer => printer.ownerId === user?.id);
+  // Load my printers from backend, including pending; hide declined/rejected
+  const [myPrinters, setMyPrinters] = useState<PrinterType[]>([]);
 
-  const handlePrinterApplication = () => {
-    // In real app, this would submit to API
-    addRole('printer-owner');
-    setShowPrinterApplication(false);
-    addToast({
-      type: 'success',
-      title: 'Printer Application Submitted',
-      message: 'Admin will review and approve your printer.'
-    });
-  };
+  const loadMyPrinters = async () => {
+    if (!user?.id) return;
+    let canceled = false;
+    try {
+      if (isDemo) {
+        // Use frontend demo data - filter printers owned by demo user
+        if (!canceled) {
+          const demoUserPrinters = printersData.printers.filter(p => 
+            p.ownerId === user.id || p.ownerId === "user-2" // "user-2" is a demo printer owner in the JSON
+          );
+          setMyPrinters(demoUserPrinters as PrinterType[]);
+        }
+        return;
+      }
 
-  const handleEditPrinter = (printer: any) => {
-    setSelectedPrinter(printer);
-    setPrinterFormData({
-      name: printer.name,
-      type: printer.type,
-      pricePerPageBW: printer.pricePerPageBW.toString(),
-      pricePerPageColor: printer.pricePerPageColor.toString(),
-      brand: printer.specifications.brand,
-      model: printer.specifications.model,
-      paperSizes: printer.specifications.paperSizes.join(','),
-      features: printer.specifications.features.join(','),
-      hall: printer.location.hall,
-      room: printer.location.room || '',
-    });
-    setShowEditPrinter(true);
-  };
-
-  const handleUpdatePrinter = () => {
-    // In real app, this would update via API
-    setShowEditPrinter(false);
-    setSelectedPrinter(null);
-    addToast({
-      type: 'success',
-      title: 'Printer Updated',
-      message: 'Your printer details have been updated successfully.'
-    });
-  };
-
-  const handleRemovePrinter = (printerId: string, printerName: string) => {
-    if (window.confirm(`Are you sure you want to remove "${printerName}"? This action cannot be undone.`)) {
-      // In real app, this would delete via API
-      addToast({
-        type: 'success',
-        title: 'Printer Removed',
-        message: `"${printerName}" has been removed successfully.`
-      });
+      // Use real backend data
+      const token = localStorage.getItem("auth_token");
+      const res = await listOwnerPrinters(user.id, token || undefined);
+      if (canceled) return;
+      if (res.ok && Array.isArray(res.data)) {
+        // Filter out declined printers from owner's dashboard
+        const filteredPrinters = (res.data as PrinterType[]).filter(p => p.status !== 'declined');
+        setMyPrinters(filteredPrinters);
+      }
+    } catch (error) {
+      addToast({ type: 'error', title: 'Failed to load printers', message: 'Please try again later.' });
     }
+    return () => {
+      canceled = true;
+    };
+  };
+
+  const loadActivities = async () => {
+    if (!user?.id || isDemo) {
+      // Use static data for demo mode
+      const activityRole = currentRole === 'printer_owner' ? 'printer-owner' : currentRole;
+      const staticActivities = activitiesData.activities[activityRole as keyof typeof activitiesData.activities] || [];
+      setActivities(staticActivities);
+      setDisplayedActivities(staticActivities.slice(0, ACTIVITIES_PER_PAGE));
+      return;
+    }
+    
+    setLoadingActivities(true);
+    try {
+      const token = localStorage.getItem("auth_token");
+      let res;
+      
+      if (currentRole === 'printer_owner') {
+        res = await getPrinterOwnerActivities(10, token || undefined);
+      } else {
+        res = await getMyActivities(10, token || undefined);
+      }
+      
+      if (res.ok) {
+        setActivities(res.data as any[]);
+        setDisplayedActivities((res.data as any[]).slice(0, ACTIVITIES_PER_PAGE));
+      } else {
+        console.error('Failed to load activities:', res.error);
+        // Fallback to static data
+        const activityRole = currentRole === 'printer_owner' ? 'printer-owner' : currentRole;
+        const staticActivities = activitiesData.activities[activityRole as keyof typeof activitiesData.activities] || [];
+        setActivities(staticActivities);
+        setDisplayedActivities(staticActivities.slice(0, ACTIVITIES_PER_PAGE));
+      }
+    } catch (error) {
+      console.error('Error loading activities:', error);
+      // Fallback to static data
+      const activityRole = currentRole === 'printer_owner' ? 'printer-owner' : currentRole;
+      const staticActivities = activitiesData.activities[activityRole as keyof typeof activitiesData.activities] || [];
+      setActivities(staticActivities);
+    }
+    setLoadingActivities(false);
+  };
+
+  useEffect(() => {
+    loadMyPrinters();
+    loadActivities();
+  }, [user?.id, isDemo, currentRole]);
+
+  // When the current user profile updates elsewhere (e.g., avatar), keep our cards fresh
+  useEffect(() => {
+    function onUserUpdated() {
+      // no-op for now, but keeps pattern consistent with AdminPage
+    }
+    window.addEventListener('auth:user-updated', onUserUpdated as EventListener);
+    return () => window.removeEventListener('auth:user-updated', onUserUpdated as EventListener);
+  }, []);
+
+  const handleEditPrinter = (printer: PrinterType) => {
+    // Navigate to unified printer form with edit mode
+    navigate('/printers/add', { state: { editPrinter: printer } });
+  };
+
+  const contactAdminForRemoval = (printer: PrinterType) => {
+    // Open WhatsApp with pre-filled message for admin
+    const message = encodeURIComponent(`Hello Admin, I would like to request removal of my printer: ${printer.name} (ID: ${printer.id}) located at ${printer.location.hall} ${printer.location.room}. Please help me remove this printer from the system.`);
+    window.open(`https://wa.me/1234567890?text=${message}`, '_blank');
   };
 
   const getDashboardStats = () => {
@@ -106,7 +148,7 @@ export const DashboardPage: React.FC = () => {
           { label: 'Documents Printed', value: '24', icon: FileText, color: 'text-info' },
           { label: 'Active Orders', value: '2', icon: Clock, color: 'text-warning' },
         ];
-      case 'printer-owner':
+      case 'printer_owner':
         return [
           { label: 'Monthly Revenue', value: '৳342.50', icon: Coins, color: 'text-success' },
           { label: 'Print Jobs', value: '89', icon: FileText, color: 'text-info' },
@@ -123,8 +165,61 @@ export const DashboardPage: React.FC = () => {
     }
   };
 
+  const refreshActivities = () => {
+    loadActivities();
+  };
+
+  // Listen for activity updates
+  useEffect(() => {
+    const handleActivityUpdate = () => {
+      refreshActivities();
+    };
+    
+    window.addEventListener('activity:refresh', handleActivityUpdate);
+    window.addEventListener('print-request:created', handleActivityUpdate);
+    window.addEventListener('print-request:status-updated', handleActivityUpdate);
+    
+    return () => {
+      window.removeEventListener('activity:refresh', handleActivityUpdate);
+      window.removeEventListener('print-request:created', handleActivityUpdate);
+      window.removeEventListener('print-request:status-updated', handleActivityUpdate);
+    };
+  }, []);
+
   const getRecentActivity = () => {
-    return activitiesData.activities[currentRole] || [];
+    return displayedActivities;
+  };
+
+  const handleLoadMore = async () => {
+    setLoadingMore(true);
+    
+    // If we have more activities cached, just show more of them
+    if (displayedActivities.length < activities.length) {
+      const nextBatch = activities.slice(displayedActivities.length, displayedActivities.length + ACTIVITIES_PER_PAGE);
+      setDisplayedActivities(prev => [...prev, ...nextBatch]);
+    } else if (!isDemo) {
+      // Load more from API
+      try {
+        const token = localStorage.getItem("auth_token");
+        let res;
+        
+        if (currentRole === 'printer_owner') {
+          res = await getPrinterOwnerActivities(activities.length + ACTIVITIES_PER_PAGE, token || undefined);
+        } else {
+          res = await getMyActivities(activities.length + ACTIVITIES_PER_PAGE, token || undefined);
+        }
+        
+        if (res.ok) {
+          const newActivities = res.data as any[];
+          setActivities(newActivities);
+          setDisplayedActivities(newActivities.slice(0, displayedActivities.length + ACTIVITIES_PER_PAGE));
+        }
+      } catch (error) {
+        console.error('Failed to load more activities:', error);
+      }
+    }
+    
+    setLoadingMore(false);
   };
 
   const stats = getDashboardStats();
@@ -137,10 +232,10 @@ export const DashboardPage: React.FC = () => {
         <div>
           <h1 className="text-3xl font-bold gradient-text mb-2">
             {currentRole === 'user' ? 'User Dashboard' : 
-             currentRole === 'printer-owner' ? 'Printer Owner Dashboard' : 
+             currentRole === 'printer_owner' ? 'Printer Owner Dashboard' : 
              'Admin Dashboard'}
           </h1>
-          <p className="text-theme-text-secondary">Welcome back, {user?.firstName} {user?.lastName}!</p>
+          <p className="text-theme-text-secondary">Welcome, {user?.firstName} {user?.lastName}!</p>
         </div>
 
         {/* Stats */}
@@ -162,7 +257,7 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         {/* Role-specific content */}
-        {currentRole === 'user' && !user?.roles.includes('printer-owner') && (
+        {currentRole === 'user' && !user?.roles.includes('printer_owner') && (
           <GlassCard className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -173,7 +268,7 @@ export const DashboardPage: React.FC = () => {
               </div>
               <GlassButton
                 variant="primary"
-                onClick={() => setShowPrinterApplication(true)}
+                onClick={() => navigate('/printers/add')}
               >
                 Apply Now
               </GlassButton>
@@ -185,22 +280,48 @@ export const DashboardPage: React.FC = () => {
         <GlassCard>
           <div className="p-6">
             <h2 className="text-lg font-semibold text-theme-text mb-4">Recent Activity</h2>
-            <div className="space-y-3">
-              {recentActivity.map((activity) => (
-                <div key={activity.id} className="flex items-center justify-between py-3 border-b border-glass-border last:border-b-0">
-                  <div>
-                    <p className="text-sm font-medium text-theme-text">{activity.action}</p>
-                    <p className="text-xs text-theme-text-secondary">{activity.time}</p>
-                  </div>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    activity.status === 'completed' 
-                      ? 'bg-success/10 text-success' 
-                      : 'bg-warning/10 text-warning'
-                  }`}>
-                    {activity.status}
-                  </span>
+            <div className="space-y-0">
+              {loadingActivities ? (
+                <div className="flex items-center justify-center py-8">
+                  <Clock className="animate-spin mr-2" size={16} />
+                  <span className="text-theme-text-secondary">Loading activities...</span>
                 </div>
-              ))}
+              ) : recentActivity.length === 0 ? (
+                <div className="text-center py-8 text-theme-text-secondary">
+                  No recent activities
+                </div>
+              ) : (
+                <>
+                  {recentActivity.map((activity: any) => (
+                    <ActivityItem 
+                      key={activity.id} 
+                      activity={{
+                        ...activity,
+                        description: activity.description || activity.action,
+                      }} 
+                    />
+                  ))}
+                  {(displayedActivities.length < activities.length || (!isDemo && activities.length >= ACTIVITIES_PER_PAGE)) && (
+                    <div className="pt-4 border-t border-white/10">
+                      <GlassButton
+                        variant="secondary"
+                        onClick={handleLoadMore}
+                        disabled={loadingMore}
+                        className="w-full"
+                      >
+                        {loadingMore ? (
+                          <div className="flex items-center justify-center">
+                            <Clock className="animate-spin mr-2" size={16} />
+                            Loading...
+                          </div>
+                        ) : (
+                          `See More (${activities.length - displayedActivities.length}+ more)`
+                        )}
+                      </GlassButton>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
         </GlassCard>
@@ -241,7 +362,7 @@ export const DashboardPage: React.FC = () => {
                   </GlassButton>
                 </>
               )}
-              {currentRole === 'printer-owner' && (
+              {currentRole === 'printer_owner' && (
                 <>
                   <GlassButton
                     variant="secondary"
@@ -261,6 +382,15 @@ export const DashboardPage: React.FC = () => {
                     <span className="font-medium">Manage Printers</span>
                     <span className="text-xs text-theme-text-secondary">Update printer settings</span>
                   </GlassButton>
+                  <GlassButton 
+                    variant="secondary" 
+                    className="p-4 h-auto flex-col"
+                    onClick={() => navigate('/printer-dashboard')}
+                  >
+                    <FileText size={24} className="mb-2" />
+                    <span className="font-medium">Print Requests</span>
+                    <span className="text-xs text-theme-text-secondary">Manage print jobs</span>
+                  </GlassButton>
                 </>
               )}
               {currentRole === 'admin' && (
@@ -268,7 +398,7 @@ export const DashboardPage: React.FC = () => {
                   <GlassButton 
                     variant="secondary" 
                     className="p-4 h-auto flex-col"
-                    onClick={() => navigate('/admin')}
+                    onClick={() => navigate('/admin#users')}
                   >
                     <Users size={24} className="mb-2" />
                     <span className="font-medium">User Management</span>
@@ -277,7 +407,7 @@ export const DashboardPage: React.FC = () => {
                   <GlassButton 
                     variant="secondary" 
                     className="p-4 h-auto flex-col"
-                    onClick={() => navigate('/admin')}
+                    onClick={() => navigate('/admin#printers')}
                   >
                     <Printer size={24} className="mb-2" />
                     <span className="font-medium">Printer Management</span>
@@ -286,7 +416,7 @@ export const DashboardPage: React.FC = () => {
                   <GlassButton 
                     variant="secondary" 
                     className="p-4 h-auto flex-col"
-                    onClick={() => navigate('/admin')}
+                    onClick={() => navigate('/admin#analytics')}
                   >
                     <BarChart3 size={24} className="mb-2" />
                     <span className="font-medium">Analytics</span>
@@ -297,113 +427,6 @@ export const DashboardPage: React.FC = () => {
             </div>
           </div>
         </GlassCard>
-
-        {/* Printer Application Modal */}
-        {showPrinterApplication && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <GlassCard className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-4">Apply as Printer Owner</h3>
-                <div className="space-y-4">
-                  <GlassInput
-                    label="Printer Name"
-                    value={printerFormData.name}
-                    onChange={(e) => setPrinterFormData(prev => ({ ...prev, name: e.target.value }))}
-                  />
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-dark-text mb-2">Printer Type</label>
-                      <select
-                        value={printerFormData.type}
-                        onChange={(e) => setPrinterFormData(prev => ({ ...prev, type: e.target.value }))}
-                        className="w-full px-4 py-3 bg-glass-bg backdrop-blur-glass border border-glass-border rounded-component text-theme-text focus:outline-none focus:border-campus-green"
-                      >
-                        <option value="color">Color Only</option>
-                        <option value="bw">Black & White Only</option>
-                        <option value="both">Both Color & B&W</option>
-                      </select>
-                    </div>
-                    <GlassInput
-                      label="B&W Price per Page (৳)"
-                      type="number"
-                      step="0.01"
-                      value={printerFormData.pricePerPageBW}
-                      onChange={(e) => setPrinterFormData(prev => ({ ...prev, pricePerPageBW: e.target.value }))}
-                    />
-                  </div>
-
-                  {printerFormData.type !== 'bw' && (
-                    <GlassInput
-                      label="Color Price per Page (৳)"
-                      type="number"
-                      step="0.01"
-                      value={printerFormData.pricePerPageColor}
-                      onChange={(e) => setPrinterFormData(prev => ({ ...prev, pricePerPageColor: e.target.value }))}
-                    />
-                  )}
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <GlassInput
-                      label="Brand"
-                      value={printerFormData.brand}
-                      onChange={(e) => setPrinterFormData(prev => ({ ...prev, brand: e.target.value }))}
-                    />
-                    <GlassInput
-                      label="Model"
-                      value={printerFormData.model}
-                      onChange={(e) => setPrinterFormData(prev => ({ ...prev, model: e.target.value }))}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <GlassInput
-                      label="Hall"
-                      value={printerFormData.hall}
-                      onChange={(e) => setPrinterFormData(prev => ({ ...prev, hall: e.target.value }))}
-                    />
-                    <GlassInput
-                      label="Room (Optional)"
-                      value={printerFormData.room}
-                      onChange={(e) => setPrinterFormData(prev => ({ ...prev, room: e.target.value }))}
-                    />
-                  </div>
-
-                  <GlassInput
-                    label="Paper Sizes (comma separated)"
-                    value={printerFormData.paperSizes}
-                    onChange={(e) => setPrinterFormData(prev => ({ ...prev, paperSizes: e.target.value }))}
-                    helperText="e.g., A4, Letter, Legal"
-                  />
-
-                  <GlassInput
-                    label="Features (comma separated)"
-                    value={printerFormData.features}
-                    onChange={(e) => setPrinterFormData(prev => ({ ...prev, features: e.target.value }))}
-                    helperText="e.g., Duplex, Stapling, Hole Punch"
-                  />
-
-                  <div className="flex gap-4 pt-4">
-                    <GlassButton
-                      variant="secondary"
-                      onClick={() => setShowPrinterApplication(false)}
-                      className="flex-1"
-                    >
-                      Cancel
-                    </GlassButton>
-                    <GlassButton
-                      variant="primary"
-                      onClick={handlePrinterApplication}
-                      className="flex-1"
-                    >
-                      Submit Application
-                    </GlassButton>
-                  </div>
-                </div>
-              </div>
-            </GlassCard>
-          </div>
-        )}
 
         {/* My Printers Modal */}
         {showMyPrinters && (
@@ -419,10 +442,7 @@ export const DashboardPage: React.FC = () => {
                     <GlassButton
                       variant="primary"
                       className="mt-4"
-                      onClick={() => {
-                        setShowMyPrinters(false);
-                        setShowPrinterApplication(true);
-                      }}
+                      onClick={() => navigate('/printers/add')}
                     >
                       Add Your First Printer
                     </GlassButton>
@@ -441,9 +461,11 @@ export const DashboardPage: React.FC = () => {
                           <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                             printer.status === 'online' 
                               ? 'bg-success/10 text-success' 
-                              : printer.status === 'busy'
+                              : printer.status === 'pending'
                               ? 'bg-warning/10 text-warning'
-                              : 'bg-danger/10 text-danger'
+                              : printer.status === 'declined'
+                              ? 'bg-danger/20 text-danger'
+                              : 'bg-neutral-500/20 text-neutral-400'
                           }`}>
                             {printer.status}
                           </span>
@@ -456,7 +478,7 @@ export const DashboardPage: React.FC = () => {
                           </div>
                           <div className="flex items-center">
                             <Coins size={14} className="mr-2" />
-                            <span>B&W: ৳{printer.pricePerPageBW} | Color: ৳{printer.pricePerPageColor}</span>
+                            <span>B&W: ৳{printer.pricePerPageBW.toFixed(2)} | Color: ৳{printer.pricePerPageColor.toFixed(2)}</span>
                           </div>
                           <div className="flex items-center">
                             <Star size={14} className="mr-2" />
@@ -475,13 +497,13 @@ export const DashboardPage: React.FC = () => {
                             Edit
                           </GlassButton>
                           <GlassButton
-                            variant="danger"
+                            variant="secondary"
                             size="sm"
-                            onClick={() => handleRemovePrinter(printer.id, printer.name)}
+                            onClick={() => contactAdminForRemoval(printer)}
                             className="flex-1"
                           >
-                            <Trash2 size={16} className="mr-1" />
-                            Remove
+                            <MessageCircle size={18} className="mr-1" />
+                            Contact Admin
                           </GlassButton>
                         </div>
                       </div>
@@ -499,10 +521,7 @@ export const DashboardPage: React.FC = () => {
                   </GlassButton>
                   <GlassButton
                     variant="primary"
-                    onClick={() => {
-                      setShowMyPrinters(false);
-                      setShowPrinterApplication(true);
-                    }}
+                    onClick={() => navigate('/printers/add')}
                     className="flex-1"
                   >
                     <Plus size={16} className="mr-2" />
@@ -514,115 +533,6 @@ export const DashboardPage: React.FC = () => {
           </div>
         )}
 
-        {/* Edit Printer Modal */}
-        {showEditPrinter && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <GlassCard className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-4">Edit Printer: {selectedPrinter?.name}</h3>
-                <div className="space-y-4">
-                  <GlassInput
-                    label="Printer Name"
-                    value={printerFormData.name}
-                    onChange={(e) => setPrinterFormData(prev => ({ ...prev, name: e.target.value }))}
-                  />
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-theme-text mb-2">Printer Type</label>
-                      <select
-                        value={printerFormData.type}
-                        onChange={(e) => setPrinterFormData(prev => ({ ...prev, type: e.target.value }))}
-                        className="w-full px-4 py-3 bg-glass-bg backdrop-blur-glass border border-glass-border rounded-component text-theme-text focus:outline-none focus:border-campus-green"
-                      >
-                        <option value="color">Color Only</option>
-                        <option value="bw">Black & White Only</option>
-                        <option value="both">Both Color & B&W</option>
-                      </select>
-                    </div>
-                    <GlassInput
-                      label="B&W Price per Page (৳)"
-                      type="number"
-                      step="0.01"
-                      value={printerFormData.pricePerPageBW}
-                      onChange={(e) => setPrinterFormData(prev => ({ ...prev, pricePerPageBW: e.target.value }))}
-                    />
-                  </div>
-
-                  {printerFormData.type !== 'bw' && (
-                    <GlassInput
-                      label="Color Price per Page (৳)"
-                      type="number"
-                      step="0.01"
-                      value={printerFormData.pricePerPageColor}
-                      onChange={(e) => setPrinterFormData(prev => ({ ...prev, pricePerPageColor: e.target.value }))}
-                    />
-                  )}
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <GlassInput
-                      label="Brand"
-                      value={printerFormData.brand}
-                      onChange={(e) => setPrinterFormData(prev => ({ ...prev, brand: e.target.value }))}
-                    />
-                    <GlassInput
-                      label="Model"
-                      value={printerFormData.model}
-                      onChange={(e) => setPrinterFormData(prev => ({ ...prev, model: e.target.value }))}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <GlassInput
-                      label="Hall"
-                      value={printerFormData.hall}
-                      onChange={(e) => setPrinterFormData(prev => ({ ...prev, hall: e.target.value }))}
-                    />
-                    <GlassInput
-                      label="Room (Optional)"
-                      value={printerFormData.room}
-                      onChange={(e) => setPrinterFormData(prev => ({ ...prev, room: e.target.value }))}
-                    />
-                  </div>
-
-                  <GlassInput
-                    label="Paper Sizes (comma separated)"
-                    value={printerFormData.paperSizes}
-                    onChange={(e) => setPrinterFormData(prev => ({ ...prev, paperSizes: e.target.value }))}
-                    helperText="e.g., A4, Letter, Legal"
-                  />
-
-                  <GlassInput
-                    label="Features (comma separated)"
-                    value={printerFormData.features}
-                    onChange={(e) => setPrinterFormData(prev => ({ ...prev, features: e.target.value }))}
-                    helperText="e.g., Duplex, Stapling, Hole Punch"
-                  />
-
-                  <div className="flex gap-4 pt-4">
-                    <GlassButton
-                      variant="secondary"
-                      onClick={() => {
-                        setShowEditPrinter(false);
-                        setSelectedPrinter(null);
-                      }}
-                      className="flex-1"
-                    >
-                      Cancel
-                    </GlassButton>
-                    <GlassButton
-                      variant="primary"
-                      onClick={handleUpdatePrinter}
-                      className="flex-1"
-                    >
-                      Update Printer
-                    </GlassButton>
-                  </div>
-                </div>
-              </div>
-            </GlassCard>
-          </div>
-        )}
       </div>
     </div>
   );
