@@ -17,6 +17,7 @@ import { useToast } from '../context/ToastContext';
 import { useTheme } from '../context/ThemeContext';
 import { listDeliveries, API_BASE } from '../lib/api';
 import { Badge } from '../components/ui/Badge';
+import demoDeliveriesData from '../data/demo-deliveries.json';
 
 interface BackendUser {
   userId: number;
@@ -40,7 +41,7 @@ interface BackendDeliveryRequest {
 type TabType = 'available' | 'active';
 
 export default function DeliveryPage() {
-  const { user } = useAuth();
+  const { user, isDemo } = useAuth();
   const { addToast } = useToast();
   const { isDark } = useTheme();
   
@@ -73,6 +74,14 @@ export default function DeliveryPage() {
     setError(null);
     
     try {
+      // Use demo data if in demo mode
+      if (isDemo) {
+        setAvailableDeliveries(demoDeliveriesData.available as any);
+        setActiveDeliveries(demoDeliveriesData.active as any);
+        setIsLoading(false);
+        return;
+      }
+
       const token = localStorage.getItem('auth_token') || localStorage.getItem('authToken');
       
       // Fetch available deliveries (pending with no assignee)
@@ -132,6 +141,23 @@ export default function DeliveryPage() {
       return;
     }
 
+    // In demo mode, just show success message without making API call
+    if (isDemo) {
+      addToast({
+        type: 'info',
+        title: 'Demo Mode',
+        message: 'In demo mode, delivery requests are not actually created. Sign up for a real account to create deliveries!'
+      });
+      setFormData({
+        itemDescription: '',
+        pickupLocation: '',
+        dropLocation: '',
+        imageUrl: ''
+      });
+      setShowCreateForm(false);
+      return;
+    }
+
     try {
       const token = localStorage.getItem('auth_token') || localStorage.getItem('authToken');
       const response = await fetch(`${API_BASE}/api/deliveries`, {
@@ -180,6 +206,16 @@ export default function DeliveryPage() {
       addToast({
         type: 'error',
         title: 'Please log in to accept deliveries'
+      });
+      return;
+    }
+
+    // In demo mode, show info message without making API call
+    if (isDemo) {
+      addToast({
+        type: 'info',
+        title: 'Demo Mode',
+        message: 'In demo mode, you cannot actually accept deliveries. Sign up for a real account to start delivering!'
       });
       return;
     }
@@ -242,6 +278,16 @@ export default function DeliveryPage() {
   };
 
   const handleUpdateStatus = async (deliveryId: number, newStatus: string) => {
+    // In demo mode, show info message without making API call
+    if (isDemo) {
+      addToast({
+        type: 'info',
+        title: 'Demo Mode',
+        message: 'In demo mode, status updates are not saved. Sign up for a real account to manage real deliveries!'
+      });
+      return;
+    }
+
     try {
       const token = localStorage.getItem('auth_token') || localStorage.getItem('authToken');
       const response = await fetch(`${API_BASE}/api/deliveries/${deliveryId}/status`, {

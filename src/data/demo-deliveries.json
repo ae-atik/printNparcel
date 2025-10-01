@@ -1,0 +1,96 @@
+{
+  "available": [
+    {
+      "deliveryReqId": 1,
+      "imageUrl": "https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg?auto=compress&cs=tinysrgb&w=200",
+      "itemDescription": "Lecture Notes Package",
+      "pickupLocation": "Library - Printing Station",
+      "dropLocation": "Residence Hall B - Room 204",
+      "deliveryStatus": "PENDING",
+      "deliveryTime": null,
+      "orderBy": {
+        "userId": 1,
+        "firstName": "Sarah",
+        "lastName": "Johnson",
+        "profilePictureUrl": "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=100"
+      },
+      "orderTo": null
+    },
+    {
+      "deliveryReqId": 2,
+      "imageUrl": "https://images.pexels.com/photos/590016/pexels-photo-590016.jpeg?auto=compress&cs=tinysrgb&w=200",
+      "itemDescription": "Research Paper - 25 pages",
+      "pickupLocation": "Engineering Building - Print Lab",
+      "dropLocation": "Library - Study Room 12",
+      "deliveryStatus": "PENDING",
+      "deliveryTime": null,
+      "orderBy": {
+        "userId": 3,
+        "firstName": "Mike",
+        "lastName": "Chen",
+        "profilePictureUrl": "https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=100"
+      },
+      "orderTo": null
+    },
+    {
+      "deliveryReqId": 4,
+      "imageUrl": "https://images.pexels.com/photos/4050315/pexels-photo-4050315.jpeg?auto=compress&cs=tinysrgb&w=200",
+      "itemDescription": "Project Report - Color Printed",
+      "pickupLocation": "Student Union - Print Center",
+      "dropLocation": "Science Building - Room 301",
+      "deliveryStatus": "PENDING",
+      "deliveryTime": null,
+      "orderBy": {
+        "userId": 5,
+        "firstName": "Alex",
+        "lastName": "Martinez",
+        "profilePictureUrl": "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100"
+      },
+      "orderTo": null
+    }
+  ],
+  "active": [
+    {
+      "deliveryReqId": 3,
+      "imageUrl": "https://images.pexels.com/photos/301920/pexels-photo-301920.jpeg?auto=compress&cs=tinysrgb&w=200",
+      "itemDescription": "Class Handouts - 8 pages",
+      "pickupLocation": "Student Union - Print Center",
+      "dropLocation": "Student Union - Café",
+      "deliveryStatus": "IN_PROGRESS",
+      "deliveryTime": "2024-01-21T11:30:00Z",
+      "orderBy": {
+        "userId": 4,
+        "firstName": "Emma",
+        "lastName": "Davis",
+        "profilePictureUrl": "https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=100"
+      },
+      "orderTo": {
+        "userId": 2,
+        "firstName": "Guest",
+        "lastName": "User",
+        "profilePictureUrl": "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100"
+      }
+    },
+    {
+      "deliveryReqId": 5,
+      "imageUrl": "https://images.pexels.com/photos/256417/pexels-photo-256417.jpeg?auto=compress&cs=tinysrgb&w=200",
+      "itemDescription": "Textbook - Economics 101",
+      "pickupLocation": "Campus Bookstore - Counter",
+      "dropLocation": "Residence Hall A - Room 156",
+      "deliveryStatus": "IN_PROGRESS",
+      "deliveryTime": "2024-01-21T12:00:00Z",
+      "orderBy": {
+        "userId": 2,
+        "firstName": "Guest",
+        "lastName": "User",
+        "profilePictureUrl": "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100"
+      },
+      "orderTo": {
+        "userId": 6,
+        "firstName": "David",
+        "lastName": "Wilson",
+        "profilePictureUrl": "https://images.pexels.com/photos/1484801/pexels-photo-1484801.jpeg?auto=compress&cs=tinysrgb&w=100"
+      }
+    }
+  ]
+}
